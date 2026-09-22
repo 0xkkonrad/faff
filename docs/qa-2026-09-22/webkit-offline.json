@@ -1,0 +1,216 @@
+[
+  {
+    "engine": "webkit",
+    "kind": "baseline",
+    "offlineMode": "emulated",
+    "errors": [],
+    "before": {
+      "controller": "http://127.0.0.1:39409/sw.js",
+      "cacheNames": [
+        "waffle-shell-v2"
+      ],
+      "cachedDocument": true
+    },
+    "controlledFetch": {
+      "error": "Load failed"
+    },
+    "reload": "page.reload: WebKit encountered an internal error\nCall log:\n\u001b[2m  - waiting for navigation until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "engine": "webkit",
+    "kind": "baseline",
+    "offlineMode": "server-down",
+    "errors": [],
+    "before": {
+      "controller": "http://127.0.0.1:37225/sw.js",
+      "cacheNames": [
+        "waffle-shell-v2"
+      ],
+      "cachedDocument": true
+    },
+    "controlledFetch": {
+      "status": 200,
+      "html": "<!doctype html>\n<html lang=\"en\" data-waffle-app>\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewp"
+    },
+    "reload": "passed",
+    "after": "\nwaffle\n0\n\ntoday.\n30 min each\n\nfocus\n4h\n\n8\n\nwaffle\n2h\n\n4\n\ncommit · 6h\nday off"
+  },
+  {
+    "engine": "webkit",
+    "kind": "fixed",
+    "offlineMode": "emulated",
+    "errors": [],
+    "before": {
+      "controller": "http://127.0.0.1:35053/sw.js",
+      "cacheNames": [
+        "waffle-shell-v3"
+      ],
+      "cachedDocument": true
+    },
+    "controlledFetch": {
+      "error": "Load failed"
+    },
+    "reload": "page.reload: WebKit encountered an internal error\nCall log:\n\u001b[2m  - waiting for navigation until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "engine": "webkit",
+    "kind": "fixed",
+    "offlineMode": "server-down",
+    "errors": [],
+    "before": {
+      "controller": "http://127.0.0.1:43415/sw.js",
+      "cacheNames": [
+        "waffle-shell-v3"
+      ],
+      "cachedDocument": true
+    },
+    "controlledFetch": {
+      "status": 200,
+      "html": "<!doctype html>\n<html lang=\"en\" data-waffle-app>\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewp"
+    },
+    "reload": "passed",
+    "after": "\nwaffle\n0\n\ntoday.\n30 min each\n\nfocus\n4h\n\n8\n\nwaffle\n2h\n\n4\n\ncommit · 6h\nday off\n"
+  },
+  {
+    "engine": "webkit",
+    "kind": "minimal",
+    "offlineMode": "emulated",
+    "errors": [],
+    "before": {
+      "controller": "http://127.0.0.1:37555/sw.js",
+      "cacheNames": [],
+      "cachedDocument": false
+    },
+    "controlledFetch": {
+      "error": "Load failed"
+    },
+    "reload": "page.reload: WebKit encountered an internal error\nCall log:\n\u001b[2m  - waiting for navigation until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "engine": "webkit",
+    "kind": "minimal",
+    "offlineMode": "server-down",
+    "errors": [],
+    "before": {
+      "controller": "http://127.0.0.1:43955/sw.js",
+      "cacheNames": [],
+      "cachedDocument": false
+    },
+    "controlledFetch": {
+      "status": 200,
+      "html": "<html><body>FROM MINIMAL SERVICE WORKER</body></html>"
+    },
+    "reload": "passed",
+    "after": "FROM MINIMAL SERVICE WORKER"
+  },
+  {
+    "engine": "chromium",
+    "kind": "baseline",
+    "offlineMode": "emulated",
+    "errors": [],
+    "before": {
+      "controller": "http://127.0.0.1:45817/sw.js",
+      "cacheNames": [
+        "waffle-shell-v2"
+      ],
+      "cachedDocument": true
+    },
+    "controlledFetch": {
+      "status": 200,
+      "html": "<!doctype html>\n<html lang=\"en\" data-waffle-app>\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewp"
+    },
+    "reload": "passed",
+    "after": "waffle\n0\ntoday.\n30 min each\nfocus\n4h\n8\nwaffle\n2h\n4\ncommit · 6h\nday off"
+  },
+  {
+    "engine": "chromium",
+    "kind": "baseline",
+    "offlineMode": "server-down",
+    "errors": [],
+    "before": {
+      "controller": "http://127.0.0.1:42135/sw.js",
+      "cacheNames": [
+        "waffle-shell-v2"
+      ],
+      "cachedDocument": true
+    },
+    "controlledFetch": {
+      "status": 200,
+      "html": "<!doctype html>\n<html lang=\"en\" data-waffle-app>\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewp"
+    },
+    "reload": "passed",
+    "after": "waffle\n0\ntoday.\n30 min each\nfocus\n4h\n8\nwaffle\n2h\n4\ncommit · 6h\nday off"
+  },
+  {
+    "engine": "chromium",
+    "kind": "fixed",
+    "offlineMode": "emulated",
+    "errors": [],
+    "before": {
+      "controller": "http://127.0.0.1:42007/sw.js",
+      "cacheNames": [
+        "waffle-shell-v3"
+      ],
+      "cachedDocument": true
+    },
+    "controlledFetch": {
+      "status": 200,
+      "html": "<!doctype html>\n<html lang=\"en\" data-waffle-app>\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewp"
+    },
+    "reload": "passed",
+    "after": "waffle\n0\ntoday.\n30 min each\nfocus\n4h\n8\nwaffle\n2h\n4\ncommit · 6h\nday off"
+  },
+  {
+    "engine": "chromium",
+    "kind": "fixed",
+    "offlineMode": "server-down",
+    "errors": [],
+    "before": {
+      "controller": "http://127.0.0.1:45735/sw.js",
+      "cacheNames": [
+        "waffle-shell-v3"
+      ],
+      "cachedDocument": true
+    },
+    "controlledFetch": {
+      "status": 200,
+      "html": "<!doctype html>\n<html lang=\"en\" data-waffle-app>\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewp"
+    },
+    "reload": "passed",
+    "after": "waffle\n0\ntoday.\n30 min each\nfocus\n4h\n8\nwaffle\n2h\n4\ncommit · 6h\nday off"
+  },
+  {
+    "engine": "chromium",
+    "kind": "minimal",
+    "offlineMode": "emulated",
+    "errors": [],
+    "before": {
+      "controller": "http://127.0.0.1:36357/sw.js",
+      "cacheNames": [],
+      "cachedDocument": false
+    },
+    "controlledFetch": {
+      "status": 200,
+      "html": "<html><body>FROM MINIMAL SERVICE WORKER</body></html>"
+    },
+    "reload": "passed",
+    "after": "FROM MINIMAL SERVICE WORKER"
+  },
+  {
+    "engine": "chromium",
+    "kind": "minimal",
+    "offlineMode": "server-down",
+    "errors": [],
+    "before": {
+      "controller": "http://127.0.0.1:38433/sw.js",
+      "cacheNames": [],
+      "cachedDocument": false
+    },
+    "controlledFetch": {
+      "status": 200,
+      "html": "<html><body>FROM MINIMAL SERVICE WORKER</body></html>"
+    },
+    "reload": "passed",
+    "after": "FROM MINIMAL SERVICE WORKER"
+  }
+]

@@ -19,7 +19,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install --with-deps chromium webkit
       - name: Browser checks
         run: |
           python3 -m http.server 8777 --directory web > /tmp/waffle-server.log 2>&1 &
@@ -31,3 +31,5 @@ jobs:
             sleep 1
           done
           npm run test:browser
+          WAFFLE_BROWSER=webkit node tests/browser-regressions.cjs
+      - run: npm run test:pwa

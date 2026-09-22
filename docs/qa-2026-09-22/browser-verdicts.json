@@ -1,0 +1,57 @@
+{
+  "reviewerLens": "Independent refutation of browser UX/accessibility findings",
+  "pinnedSha": "85ed1badf10fba2ac735915d460a4e2ee692da4a",
+  "killList": "/tmp/waffle-qa-20260922/kill-list.md",
+  "killListRulingMatches": [],
+  "reproCommand": "node /tmp/waffle-qa-20260922/model/verify-browser.cjs",
+  "verdicts": [
+    {
+      "id": "B1",
+      "verdict": "VERIFIED",
+      "severity": "P2",
+      "file": "web/app.js",
+      "line": 37,
+      "claim": "Core timer actions lose keyboard focus when their initiating button changes action.",
+      "refutationAttempt": "Checked whether the focus key matches an equivalent rendered control or whether a dialog fallback moves focus. Commit/start/pause/resume all replace their triggering action button; no matching target and no dialog fallback exist.",
+      "evidence": "Activated each of commit, start, pause, and resume with keyboard Enter in Chromium. document.activeElement.tagName was BODY after each transition.",
+      "scope": "Keyboard continuity and visible focus; action itself still completes and saves."
+    },
+    {
+      "id": "B2",
+      "verdict": "VERIFIED",
+      "severity": "P2",
+      "file": "web/app.js",
+      "line": 33,
+      "relatedLocations": ["web/view.js:126", "web/app.css:117", "web/app.css:134", "web/calendar.css:3"],
+      "claim": "The undo control remains clickable above an open modal and can replace the modal workflow.",
+      "refutationAttempt": "Checked aria-modal, focus trapping, inherited inert state, CSS pointer events, stacking, and actual elementFromPoint hit testing. aria-modal and the keyboard trap do not disable mouse/touch interaction, while the toast button explicitly restores pointer events.",
+      "evidence": "After rating then opening options at 390x844, undo is outside the dialog, has no inert ancestor, toast z-index is 6 versus backdrop 5, and elementFromPoint selects undo. A normal Playwright click on undo removes the modal and returns the session to review.",
+      "scope": "Background-action isolation and dialog overlay; no duplicate rating or data corruption observed."
+    },
+    {
+      "id": "B3",
+      "verdict": "VERIFIED",
+      "severity": "P2",
+      "file": "web/app.js",
+      "line": 10,
+      "relatedLocations": ["web/app.js:284"],
+      "claim": "Reloading a history page renders the timer while the URL still says #history.",
+      "refutationAttempt": "Checked whether popstate runs on initial page load or whether initialization restores history.state. Startup recognizes only #calendar, and does not restore the stored history date. popstate contains separate routing but does not repair initial load.",
+      "evidence": "Navigated through calendar into a saved session history, confirmed .history-page, then reloaded. URL stayed index.html#history; .history-page count became zero and .timer-page count became one.",
+      "scope": "Route and selection persistence; session history remains saved."
+    },
+    {
+      "id": "B4",
+      "verdict": "VERIFIED_NARROWED",
+      "severity": "P3",
+      "file": "web/app.js",
+      "line": 267,
+      "claim": "Importing JSON null displays an internal JavaScript TypeError instead of a useful invalid-backup message.",
+      "refutationAttempt": "Checked error handling and whether null causes an uncaught error, broken state, or restore mutation. The TypeError is caught and displayed by toast; no restore confirmation opens and existing data is unchanged.",
+      "evidence": "Uploaded a file whose complete contents are null. The toast reads Cannot read properties of null (reading 'kind'). Restore confirmation count remains zero.",
+      "scope": "Error-message quality only; any claim of app crash or data loss is refuted."
+    }
+  ],
+  "statistics": {"verified":3,"verifiedNarrowed":1,"refuted":0},
+  "repositoryFilesModified": false
+}

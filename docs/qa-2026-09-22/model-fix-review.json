@@ -1,0 +1,41 @@
+{
+  "target": "/workspaces/sandbox/worktrees/waffle-fixes-20260922",
+  "base": "85ed1badf10fba2ac735915d460a4e2ee692da4a",
+  "lens": "immutability, state invariants, concurrency",
+  "verdict": "PASS",
+  "newBugs": [],
+  "materialUntestedConcerns": [],
+  "checks": [
+    {
+      "name": "Differential model transitions with frozen inputs",
+      "command": "node /tmp/waffle-qa-20260922/model/fix-regressions.mjs",
+      "result": "8,000 deterministic transitions compared with pinned implementation; 2,625 accepted. States, events, undo values, and errors matched. Deeply frozen input snapshots remained unchanged."
+    },
+    {
+      "name": "Repeated partial sessions",
+      "command": "node /tmp/waffle-qa-20260922/model/fix-regressions.mjs",
+      "result": "30 partial-session endings succeeded with frozen inputs; fixes M2."
+    },
+    {
+      "name": "Historical history route reload",
+      "command": "node /tmp/waffle-qa-20260922/model/fix-browser.cjs",
+      "result": "With today mocked to 23 Sept, reloading 22 Sept history preserves 22 Sept and its recorded session. Verified the additional initial history.state.date fix."
+    },
+    {
+      "name": "Concurrent synchronization",
+      "command": "node /tmp/waffle-qa-20260922/model/fix-browser.cjs",
+      "result": "60 DRAFT writes across two windows with BroadcastChannel publication converge at revision 65. Both rendered plans match final IndexedDB state; no browser errors."
+    },
+    {
+      "name": "Cross-window restore with stale prior-day dialog",
+      "command": "node /tmp/waffle-qa-20260922/model/fixed-restore-stale-sheet.cjs",
+      "result": "Restore completes in B; A closes the removed-date dialog and shows current-day planning. No obsolete prior-day display and no pageerrors; fixes M1."
+    },
+    {
+      "name": "Repository model regressions",
+      "command": "npm test",
+      "result": "13/13 passed."
+    }
+  ],
+  "repositoryFilesModified": false
+}

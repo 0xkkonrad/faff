@@ -82,7 +82,7 @@ export function validateState(state) {
     assert(typeof day.off === 'boolean' && (day.off ? day.focus === 0 && day.waffle === 0 : validTargets(day.focus, day.waffle)), 'Invalid daily plan.');
     assert(day.committedAt === null || timestamp(day.committedAt), 'Invalid commitment date.');
     assert(day.endedAt === null || timestamp(day.endedAt), 'Invalid end date.');
-    assert(Array.isArray(day.sessions) && day.sessions.length <= MAX_SESSIONS && Array.isArray(day.partials) && day.partials.length <= MAX_SESSIONS, 'Invalid saved sessions.');
+    assert(Array.isArray(day.sessions) && day.sessions.length <= MAX_SESSIONS && Array.isArray(day.partials), 'Invalid saved sessions.');
     assert(!day.off || (day.sessions.length === 0 && day.partials.length === 0 && day.committedAt && day.endedAt), 'Invalid day off.');
     assert(day.committedAt || (!day.sessions.length && !day.partials.length && !day.endedAt), 'Uncommitted day contains work.');
     assert(day.sessions.length <= day.focus + day.waffle, 'Saved sessions exceed the plan.');
@@ -105,7 +105,7 @@ export function validateState(state) {
   return state;
 }
 
-function reconcile(state, now, events) {
+function reconcile(state, now, events, editDay) {
   let changed = false;
   const today = dateKey(now);
   if (!state.days[today]) { state.days[today] = newDay(today, state.defaults); changed = true; }
@@ -118,7 +118,7 @@ function reconcile(state, now, events) {
   }
   for (const day of Object.values(state.days)) {
     if (day.date < today && day.committedAt && !day.endedAt && state.active?.date !== day.date) {
-      day.endedAt = new Date(`${day.date}T23:59:59.999`).getTime();
+      editDay(day.date).endedAt = new Date(`${day.date}T23:59:59.999`).getTime();
       changed = true;
     }
   }
@@ -126,9 +126,20 @@ function reconcile(state, now, events) {
 }
 
 export function updateState(previous, action = { type: 'SYNC' }, now = Date.now()) {
-  const state = structuredClone(previous), events = [];
-  let changed = reconcile(state, now, events), undo = null;
-  const today = dateKey(now), date = action.date || today, day = state.days[date];
+  // Historical days stay shared; only the days touched by this action are copied.
+  const state = {
+    ...previous, defaults: { ...previous.defaults }, settings: { ...previous.settings },
+    days: { ...previous.days }, active: previous.active ? { ...previous.active } : null,
+  }, events = [];
+  function editDay(date) {
+    const day = state.days[date];
+    if (day && day === previous.days[date]) {
+      state.days[date] = { ...day, sessions: day.sessions.map(session => ({ ...session })), partials: day.partials.map(partial => ({ ...partial })) };
+    }
+    return state.days[date];
+  }
+  let changed = reconcile(state, now, events, editDay), undo = null;
+  const today = dateKey(now), date = action.date || today, day = action.type === 'SYNC' ? state.days[date] : editDay(date);
   const editable = date === today || state.active?.date === date;
   const active = state.active;
   switch (action.type) {
@@ -178,7 +189,7 @@ export function updateState(previous, action = { type: 'SYNC' }, now = Date.now(
     case 'RATE': {
       assert(active?.id === action.id && active.phase === 'review', 'This session is not waiting for a rating.');
       assert(['focus', 'waffle'].includes(action.grade), 'Choose focused or waffle.');
-      const owner = state.days[active.date];
+      const owner = editDay(active.date);
       owner.sessions.push({ id: active.id, grade: action.grade, durationMs: SESSION_MS, completedAt: active.completedAt, ratedAt: now });
       state.active = null;
       if (owner.sessions.length === owner.focus + owner.waffle || owner.date < today) owner.endedAt = now;

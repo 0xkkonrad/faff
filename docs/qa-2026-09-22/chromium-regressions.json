@@ -1,0 +1,53 @@
+{
+  "base": "http://localhost:3118/",
+  "results": [
+    {
+      "name": "keyboard-timer-and-completion",
+      "status": "PASS"
+    },
+    {
+      "name": "modal-hides-undo-without-losing-it",
+      "status": "PASS"
+    },
+    {
+      "name": "dialog-keyboard-390",
+      "status": "PASS"
+    },
+    {
+      "name": "dialog-keyboard-1024",
+      "status": "PASS"
+    },
+    {
+      "name": "dialog-keyboard-667",
+      "status": "PASS"
+    },
+    {
+      "name": "history-reload-today",
+      "status": "PASS"
+    },
+    {
+      "name": "history-reload-retains-selected-date",
+      "status": "PASS"
+    },
+    {
+      "name": "null-backup-retains-data",
+      "status": "PASS"
+    },
+    {
+      "name": "cross-tab-restore-stale-correction-day",
+      "status": "PASS"
+    },
+    {
+      "name": "cross-tab-restore-stale-correction-session",
+      "status": "PASS"
+    },
+    {
+      "name": "unchanged-sync-preserves-the-view",
+      "status": "PASS"
+    },
+    {
+      "name": "idle-title-is-stable",
+      "status": "PASS"
+    }
+  ]
+}

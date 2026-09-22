@@ -29,12 +29,12 @@ function gradeButtons(extra = '') {
   return `<div class="rating-options"><button data-grade="focus" ${extra}>${icon('check')}<span>focused</span></button><button data-grade="waffle" ${extra}>${logo('rating-mark')}<span>waffle</span></button></div>`;
 }
 
-function home(state, ui) {
+function home(state, ui, currentStreak) {
   const date = homeDate(state), day = state.days[date], active = state.active, counts = totals(day);
   if (!day.committedAt) return `<main class="app-body planning"><div class="page-title"><h1>today.</h1><span>30 min each</span></div><div class="plan-mascot">${logo('mascot')}</div>${planFields(day, 'draft')}<div class="app-bottom">${primary(`commit · ${hours(day.focus + day.waffle)}`, 'commit', 'check')}<button class="text-button" data-action="day-off">day off</button></div></main>`;
   const previousDay = date !== dateKey() ? `<p class="previous-date">${labelDate(date)}</p>` : '';
   if (active?.phase === 'review') return `<main class="app-body rating-page"><div class="rating-center">${previousDay}<div class="countdown">00:00</div><h1>focused?</h1></div><div class="rating-bottom">${gradeButtons(`data-session="${escape(active.id)}"`)}${budget(state, day, ui)}</div></main>`;
-  if (day.endedAt) return `<main class="app-body result-page"><div class="result-center">${logo('result-mascot')}<h1>${day.off ? 'day off.' : 'day done.'}</h1>${day.off ? '' : budget(state, day, ui)}<p>${day.off ? `${streak(state)} day streak · held` : result(day) === 'met' ? `${streak(state)} day streak` : day.sessions.length === day.focus + day.waffle ? 'daily limit reached' : 'focus target missed'}</p></div><div class="app-bottom">${primary('calendar', 'calendar', 'calendar')}</div></main>`;
+  if (day.endedAt) return `<main class="app-body result-page"><div class="result-center">${logo('result-mascot')}<h1>${day.off ? 'day off.' : 'day done.'}</h1>${day.off ? '' : budget(state, day, ui)}<p>${day.off ? `${currentStreak} day streak · held` : result(day) === 'met' ? `${currentStreak} day streak` : day.sessions.length === day.focus + day.waffle ? 'daily limit reached' : 'focus target missed'}</p></div><div class="app-bottom">${primary('calendar', 'calendar', 'calendar')}</div></main>`;
   const action = active?.phase === 'running' ? 'pause' : active?.phase === 'paused' ? 'resume' : 'start';
   return `<main class="app-body timer-page"><div class="timer-center">${previousDay}<div class="countdown live-clock" role="timer" aria-label="Time left in this session">${clock(active)}</div>${budget(state, day, ui)}</div><div class="app-bottom">${primary(action, action, action === 'pause' ? 'pause' : 'play')}${!active && counts.focus >= day.focus ? '<button class="text-button" data-action="end">end day</button>' : ''}</div></main>`;
 }
@@ -52,12 +52,12 @@ function dock(state) {
   return `<div class="session-dock"><button data-action="home">${state.active.phase === 'review' ? 'rate session' : `<span class="live-clock">${clock(state.active)}</span>`}${icon('arrow')}</button></div>`;
 }
 
-function calendar(state, ui) {
+function calendar(state, ui, currentStreak) {
   const first = new Date(`${ui.month}-01T12:00:00Z`), year = first.getUTCFullYear(), month = first.getUTCMonth();
   const title = first.toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' }).toLowerCase();
   const offset = (first.getUTCDay() + 6) % 7, count = new Date(Date.UTC(year, month + 1, 0)).getUTCDate(), selected = state.days[ui.selectedDay];
   const selectedStatus = result(selected), text = selectedStatus === 'met' ? 'target met' : selectedStatus === 'missed' ? 'target missed' : selectedStatus === 'off' ? 'day off' : selectedStatus === 'open' ? 'in progress' : 'not planned';
-  return `<main class="app-body calendar-page calendar-counts calendar-visual"><div class="calendar-top">${back('home')}<div class="streak-total"><strong>${streak(state)}</strong><span>day streak</span></div></div><div class="month-row"><button data-month="-1" aria-label="Previous month" ${ui.month <= '2000-01' ? 'disabled' : ''}>‹</button><h1>${title}</h1><button data-month="1" aria-label="Next month" ${ui.month >= dateKey().slice(0, 7) ? 'disabled' : ''}>›</button></div><div class="counts-key"><span><i class="cell focus"></i>focus</span><span><i class="cell waffle"></i>waffle</span></div><div class="weekdays" aria-hidden="true">${['m', 't', 'w', 't', 'f', 's', 's'].map(letter => `<span>${letter}</span>`).join('')}</div><div class="calendar-grid">${'<span></span>'.repeat(offset)}${Array.from({ length: count }, (_, index) => {
+  return `<main class="app-body calendar-page calendar-counts calendar-visual"><div class="calendar-top">${back('home')}<div class="streak-total"><strong>${currentStreak}</strong><span>day streak</span></div></div><div class="month-row"><button data-month="-1" aria-label="Previous month" ${ui.month <= '2000-01' ? 'disabled' : ''}>‹</button><h1>${title}</h1><button data-month="1" aria-label="Next month" ${ui.month >= dateKey().slice(0, 7) ? 'disabled' : ''}>›</button></div><div class="counts-key"><span><i class="cell focus"></i>focus</span><span><i class="cell waffle"></i>waffle</span></div><div class="weekdays" aria-hidden="true">${['m', 't', 'w', 't', 'f', 's', 's'].map(letter => `<span>${letter}</span>`).join('')}</div><div class="calendar-grid">${'<span></span>'.repeat(offset)}${Array.from({ length: count }, (_, index) => {
     const date = `${ui.month}-${String(index + 1).padStart(2, '0')}`, day = state.days[date], counts = day ? totals(day) : null, status = result(day);
     const description = day?.off ? 'day off' : counts && day.committedAt ? `${counts.focus} focus and ${counts.waffle} waffle sessions` : 'no recorded sessions';
     return `<button class="calendar-day ${status} ${ui.selectedDay === date ? 'selected' : ''}" data-day="${date}" aria-label="${labelDate(date)}, ${description}" ${date === dateKey() ? 'aria-current="date"' : ''} ${!day?.committedAt && date !== dateKey() ? 'disabled' : ''}><span class="day-number">${index + 1}</span>${day?.off ? '<span class="day-off-label">-</span>' : day?.committedAt ? patch(day) : '<span class="day-empty">-</span>'}</button>`;
@@ -84,7 +84,7 @@ function settings(state, ui) {
   return `<div class="settings-list"><div class="settings-toggles">${switches.map(({ key, label, checked, hint, disabled }) => `<button type="button" class="setting-switch" role="switch" aria-checked="${checked}" aria-labelledby="setting-${key}-label" ${hint ? `aria-describedby="setting-${key}-hint"` : ''} ${key === 'alerts' ? 'data-action="alerts"' : `data-setting="${key}"`} ${disabled ? 'disabled' : ''} ${key === 'alerts' && ui.alertsPending ? 'aria-busy="true"' : ''}><span class="setting-label"><span id="setting-${key}-label">${label}</span>${hint ? `<small id="setting-${key}-hint">${hint}</small>` : ''}</span><span class="switch-box" aria-hidden="true">${icon('check')}</span></button>`).join('')}</div><p class="setting-note">Alerts may be delayed when Android suspends Waffle.</p><div class="settings-actions">${row(ui.protected ? 'device storage protected' : 'protect local saves', 'protect', ui.protected)}${row('download backup', 'export')}${row('restore backup', 'import')}</div><p class="setting-note">Saved on this device. No account or sync.</p></div>`;
 }
 
-function sheet(state, ui) {
+function sheet(state, ui, currentStreak) {
   if (!ui.sheet) return '';
   const { type } = ui.sheet, date = ui.sheet.date || homeDate(state), day = state.days[date];
   let title = '', content = '';
@@ -99,7 +99,7 @@ function sheet(state, ui) {
   }
   if (type === 'off') {
     title = 'day off?';
-    content = `${logo('sheet-mascot')}<p class="sheet-note">${streak(state)} day streak · held</p>${primary('commit day off', 'confirm-off', 'check')}`;
+    content = `${logo('sheet-mascot')}<p class="sheet-note">${currentStreak} day streak · held</p>${primary('commit day off', 'confirm-off', 'check')}`;
   }
   if (type === 'end') {
     title = 'end day?';
@@ -123,5 +123,6 @@ function sheet(state, ui) {
 }
 
 export function render(state, ui) {
-  return `<header class="app-header"><button class="wordmark" data-action="home" aria-label="Waffle, back to timer">${logo()}<span>waffle</span></button><div><button class="icon-button calendar-button" data-action="calendar" aria-label="Calendar, ${streak(state)} day streak">${icon('calendar')}<span class="streak-badge">${streak(state)}</span></button><button class="icon-button" data-action="options" aria-label="Daily plan and options">${icon('more')}</button></div></header>${ui.page === 'calendar' ? calendar(state, ui) : ui.page === 'history' ? history(state, ui) : home(state, ui)}${sheet(state, ui)}${ui.toast ? `<div class="app-toast" role="status"><span>${escape(ui.toast.message)}</span>${ui.toast.undo ? '<button data-action="undo">undo</button>' : ''}</div>` : ''}`;
+  const currentStreak = streak(state);
+  return `<header class="app-header"><button class="wordmark" data-action="home" aria-label="Waffle, back to timer">${logo()}<span>waffle</span></button><div><button class="icon-button calendar-button" data-action="calendar" aria-label="Calendar, ${currentStreak} day streak">${icon('calendar')}<span class="streak-badge">${currentStreak}</span></button><button class="icon-button" data-action="options" aria-label="Daily plan and options">${icon('more')}</button></div></header>${ui.page === 'calendar' ? calendar(state, ui, currentStreak) : ui.page === 'history' ? history(state, ui) : home(state, ui, currentStreak)}${sheet(state, ui, currentStreak)}${ui.toast && (!ui.sheet || !ui.toast.undo) ? `<div class="app-toast" role="status"><span>${escape(ui.toast.message)}</span>${ui.toast.undo ? '<button data-action="undo">undo</button>' : ''}</div>` : ''}`;
 }

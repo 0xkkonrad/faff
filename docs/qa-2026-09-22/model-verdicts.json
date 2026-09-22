@@ -1,0 +1,39 @@
+{
+  "M1": {
+    "verdict": "confirmed",
+    "scenario": "Tab A opens correction modal for yesterday session. Tab B restores valid backup containing only today through actual file input/confirm flow. Observe tab A auto synchronization then attempt correction.",
+    "afterRestore": {
+      "errors": [
+        "Cannot read properties of undefined (reading 'sessions')",
+        "Cannot read properties of undefined (reading 'sessions')"
+      ],
+      "dialog": "session 121 sept · updates the streakfocusedwaffle",
+      "history": "01focused30m"
+    },
+    "afterCorrection": {
+      "errors": [
+        "Cannot read properties of undefined (reading 'sessions')",
+        "Cannot read properties of undefined (reading 'sessions')",
+        "Cannot read properties of undefined (reading 'sessions')"
+      ],
+      "dialogCount": 1
+    },
+    "canRecover": "no sessions yet"
+  },
+  "M2": {
+    "verdict": "confirmed",
+    "partialCount": 24,
+    "active": {
+      "id": "partial-24",
+      "date": "2026-09-22",
+      "phase": "paused",
+      "startedAt": 1790069040000,
+      "deadline": null,
+      "remainingMs": 1740000,
+      "completedAt": null
+    },
+    "failure": "Invalid saved sessions.",
+    "actionCount": 124,
+    "scenario": "Commit focus=1 waffle=0. For each partial: start, pass 1 minute, pause, end. Reopen through TARGETS focus=1 then focus=2. On the 25th partial END, validator rejects partials length=25 although model permits another session."
+  }
+}

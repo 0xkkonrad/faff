@@ -1,0 +1,252 @@
+{
+  "verdict": "pass_with_documented_limits",
+  "performance": [
+    {
+      "days": 0,
+      "rate": 1,
+      "measurements": {
+        "update": {
+          "before_ms": 0,
+          "after_ms": 0,
+          "reduction_pct": null
+        },
+        "storageSync": {
+          "before_ms": 0.3,
+          "after_ms": 0.4,
+          "reduction_pct": -33.3
+        },
+        "storageChange": {
+          "before_ms": 0.6,
+          "after_ms": 0.5,
+          "reduction_pct": 16.7
+        },
+        "renderCalendar": {
+          "before_ms": 1.8,
+          "after_ms": 1.8,
+          "reduction_pct": 0.0
+        }
+      }
+    },
+    {
+      "days": 365,
+      "rate": 1,
+      "measurements": {
+        "update": {
+          "before_ms": 3.2,
+          "after_ms": 1.1,
+          "reduction_pct": 65.6
+        },
+        "storageSync": {
+          "before_ms": 9.7,
+          "after_ms": 4.6,
+          "reduction_pct": 52.6
+        },
+        "storageChange": {
+          "before_ms": 9.9,
+          "after_ms": 7.2,
+          "reduction_pct": 27.3
+        },
+        "renderCalendar": {
+          "before_ms": 2.7,
+          "after_ms": 2.3,
+          "reduction_pct": 14.8
+        }
+      }
+    },
+    {
+      "days": 1825,
+      "rate": 1,
+      "measurements": {
+        "update": {
+          "before_ms": 18.7,
+          "after_ms": 3.3,
+          "reduction_pct": 82.4
+        },
+        "storageSync": {
+          "before_ms": 37,
+          "after_ms": 20.8,
+          "reduction_pct": 43.8
+        },
+        "storageChange": {
+          "before_ms": 47.5,
+          "after_ms": 29.3,
+          "reduction_pct": 38.3
+        },
+        "renderCalendar": {
+          "before_ms": 7.1,
+          "after_ms": 3.6,
+          "reduction_pct": 49.3
+        }
+      }
+    },
+    {
+      "days": 3650,
+      "rate": 1,
+      "measurements": {
+        "update": {
+          "before_ms": 37.3,
+          "after_ms": 6.8,
+          "reduction_pct": 81.8
+        },
+        "storageSync": {
+          "before_ms": 73.7,
+          "after_ms": 36.9,
+          "reduction_pct": 49.9
+        },
+        "storageChange": {
+          "before_ms": 93.4,
+          "after_ms": 62.7,
+          "reduction_pct": 32.9
+        },
+        "renderCalendar": {
+          "before_ms": 12.3,
+          "after_ms": 5.6,
+          "reduction_pct": 54.5
+        }
+      }
+    },
+    {
+      "days": 0,
+      "rate": 4,
+      "measurements": {
+        "update": {
+          "before_ms": 0,
+          "after_ms": 0,
+          "reduction_pct": null
+        },
+        "storageSync": {
+          "before_ms": 1.2,
+          "after_ms": 0.9,
+          "reduction_pct": 25.0
+        },
+        "storageChange": {
+          "before_ms": 2.5,
+          "after_ms": 1.9,
+          "reduction_pct": 24.0
+        },
+        "renderCalendar": {
+          "before_ms": 7,
+          "after_ms": 6.7,
+          "reduction_pct": 4.3
+        }
+      }
+    },
+    {
+      "days": 365,
+      "rate": 4,
+      "measurements": {
+        "update": {
+          "before_ms": 12.4,
+          "after_ms": 2,
+          "reduction_pct": 83.9
+        },
+        "storageSync": {
+          "before_ms": 26.3,
+          "after_ms": 15.6,
+          "reduction_pct": 40.7
+        },
+        "storageChange": {
+          "before_ms": 35.6,
+          "after_ms": 23,
+          "reduction_pct": 35.4
+        },
+        "renderCalendar": {
+          "before_ms": 11,
+          "after_ms": 9.5,
+          "reduction_pct": 13.6
+        }
+      }
+    },
+    {
+      "days": 1825,
+      "rate": 4,
+      "measurements": {
+        "update": {
+          "before_ms": 71.3,
+          "after_ms": 12.6,
+          "reduction_pct": 82.3
+        },
+        "storageSync": {
+          "before_ms": 139.5,
+          "after_ms": 78.2,
+          "reduction_pct": 43.9
+        },
+        "storageChange": {
+          "before_ms": 183.4,
+          "after_ms": 114.7,
+          "reduction_pct": 37.5
+        },
+        "renderCalendar": {
+          "before_ms": 25.1,
+          "after_ms": 16.3,
+          "reduction_pct": 35.1
+        }
+      }
+    },
+    {
+      "days": 3650,
+      "rate": 4,
+      "measurements": {
+        "update": {
+          "before_ms": 156.9,
+          "after_ms": 27.6,
+          "reduction_pct": 82.4
+        },
+        "storageSync": {
+          "before_ms": 285.5,
+          "after_ms": 146.9,
+          "reduction_pct": 48.5
+        },
+        "storageChange": {
+          "before_ms": 400.3,
+          "after_ms": 226.2,
+          "reduction_pct": 43.5
+        },
+        "renderCalendar": {
+          "before_ms": 47.2,
+          "after_ms": 32.5,
+          "reduction_pct": 31.1
+        }
+      }
+    }
+  ],
+  "P1": "Confirmed substantial reduction. Model update still validates state and scans days; storage still reads/writes entire history. Do not claim constant-time operations or elimination of all long-history lag.",
+  "P2": "Remote revision duplication fixed: 2 transactions/2 paints becomes 1/1. A clustered visibility/focus/pageshow burst still causes 2 transactions, now 0 unchanged paints.",
+  "P3": "Fixed: idle title mutations decline from 12 to 0 per three seconds; polling reduced from 250 ms to 1000 ms. No measured battery-life claim is supported.",
+  "correctness": {
+    "checks": 10000,
+    "failures": 0,
+    "actions": {
+      "SETTING": 156,
+      "DAY_OFF": 51,
+      "SYNC": 861,
+      "COMMIT": 259,
+      "TARGETS": 252,
+      "START": 442,
+      "RATE": 4033,
+      "UNDO_RATE": 3653,
+      "CORRECT": 81,
+      "PAUSE": 138,
+      "RESUME": 64,
+      "END": 10
+    },
+    "method": "10,000 deterministic differential actions compared old/new model outputs/errors; recursively frozen previous state ensures copy-on-write never mutates input. Includes midnight reconciliation, all normal lifecycle actions, corrections, undo, settings and invalid plan changes."
+  },
+  "pwa": "Fixed-source two-tab update, cache replacement, timer persistence and offline reload all passed. Baseline-to-fixed migration test recorded separately.",
+  "completeness_critic": {
+    "material_remaining_defects": "No new release-blocking defect established in this verification scope.",
+    "residual_performance": "At 4x CPU throttling, 10-year synthetic history still takes 146.9 ms median to synchronize and 226.2 ms for a setting change. This is improved, not eliminated; isolated IndexedDB changes were intentionally avoided.",
+    "gaps": [
+      "Physical Android/iOS installation, screen wake locks, OS suspension and actual notification delivery were not validated on hardware.",
+      "Five-sample synthetic-history medians support specific operation comparisons, not a claim that the entire app is a fixed percentage faster.",
+      "Only Chromium was exercised in this performance/PWA verification lane; other agents own accessibility and broader interaction QA."
+    ]
+  },
+  "artifacts": [
+    "bench-after.json",
+    "lifecycle-after.json",
+    "update-after.json",
+    "immutability.json",
+    "update-migration.json"
+  ]
+}

@@ -1,4 +1,4 @@
-const { chromium, expect } = require(process.env.WAFFLE_PLAYWRIGHT || '@playwright/test');
+const { [process.env.WAFFLE_BROWSER || 'chromium']: browserType, expect } = require(process.env.WAFFLE_PLAYWRIGHT || '@playwright/test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const base = process.env.WAFFLE_URL || 'http://localhost:8777/';
@@ -24,7 +24,7 @@ async function fresh(width=390, height=844, time=start) {
   return { context, page };
 }
 (async () => {
-  browser = await chromium.launch({ headless: true });
+  browser = await browserType.launch({ headless: true });
   const {context,page} = await fresh();
   await capture(page,'morning');
   await choose(page,1,1);

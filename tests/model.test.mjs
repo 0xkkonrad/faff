@@ -118,3 +118,70 @@ test('invalid backups and impossible daily limits are rejected', () => {
   duplicate.days[dateKey(morning)].sessions.push(structuredClone(duplicate.days[dateKey(morning)].sessions[0]));
   assert.throws(() => validateState(duplicate));
 });
+
+test('state transitions preserve earlier snapshots, including historical corrections and rollover', () => {
+  function freeze(value) {
+    if (value && typeof value === 'object') {
+      Object.values(value).forEach(freeze);
+      Object.freeze(value);
+    }
+    return value;
+  }
+  let state = freeze(createState(morning));
+  function run(action, now = morning) {
+    const before = JSON.stringify(state);
+    const output = updateState(state, action, now);
+    assert.equal(JSON.stringify(state), before);
+    state = freeze(output.state);
+    return output;
+  }
+  run({ type: 'DRAFT', focus: 2, waffle: 1 });
+  run({ type: 'COMMIT', focus: 2, waffle: 1 });
+  run({ type: 'START', id: 'immutable' });
+  run({ type: 'PAUSE', id: 'immutable' }, morning + 60000);
+  run({ type: 'RESUME', id: 'immutable' }, morning + 120000);
+  const rated = run({ type: 'RATE', id: 'immutable', grade: 'focus' }, morning + SESSION_MS + 60000);
+  run({ type: 'UNDO_RATE', ...rated.undo }, morning + SESSION_MS + 60000);
+  run({ type: 'RATE', id: 'immutable', grade: 'waffle' }, morning + SESSION_MS + 60000);
+  run({ type: 'TARGETS', focus: 2, waffle: 2 }, morning + SESSION_MS + 60000);
+  run({ type: 'START', id: 'partial' }, morning + SESSION_MS + 60000);
+  run({ type: 'PAUSE', id: 'partial' }, morning + SESSION_MS + 120000);
+  run({ type: 'END' }, morning + SESSION_MS + 120000);
+  run({ type: 'DAY_OFF' }, morning + 86400000);
+  run({ type: 'CORRECT', date: dateKey(morning), id: 'immutable', grade: 'focus' }, morning + 86400000);
+  run({ type: 'SETTING', key: 'sound', value: false }, morning + 86400000);
+  run({ type: 'COMMIT', focus: 1, waffle: 0 }, morning + 2 * 86400000);
+  run({ type: 'SYNC' }, morning + 3 * 86400000);
+  assert.equal(state.days[dateKey(morning)].sessions[0].grade, 'focus');
+  assert.equal(state.days[dateKey(morning)].partials.length, 1);
+  assert.equal(result(state.days[dateKey(morning + 2 * 86400000)]), 'missed');
+});
+
+test('ending reopened days preserves more than 24 partial sessions', () => {
+  let state = setup(1, 0);
+  for (let index = 0; index < 30; index++) {
+    const now = morning + index * 120000;
+    state = act(state, { type: 'START', id: `partial-${index}` }, now);
+    state = act(state, { type: 'PAUSE', id: `partial-${index}` }, now + 60000);
+    state = act(state, { type: 'END' }, now + 60000);
+    assert.equal(state.days[dateKey(now)].partials.length, index + 1);
+    if (index < 29) {
+      state = act(state, { type: 'TARGETS', focus: 1, waffle: 0 }, now + 60000);
+      state = act(state, { type: 'TARGETS', focus: 2, waffle: 0 }, now + 60000);
+    }
+  }
+  assert.equal(state.active, null);
+  assert.equal(state.days[dateKey(morning)].sessions.length, 0);
+  validateState(JSON.parse(JSON.stringify(state)));
+});
+
+test('a rejected action cannot modify an earlier state snapshot', () => {
+  const state = complete(setup(1, 0), 'duplicate', 'focus');
+  const snapshot = structuredClone(state);
+  assert.throws(() => act(state, { type: 'TARGETS', focus: 24, waffle: 1 }));
+  assert.deepEqual(state, snapshot);
+  const reopened = act(state, { type: 'TARGETS', focus: 2, waffle: 0 });
+  const reopenedSnapshot = structuredClone(reopened);
+  assert.throws(() => act(reopened, { type: 'START', id: 'duplicate' }));
+  assert.deepEqual(reopened, reopenedSnapshot);
+});

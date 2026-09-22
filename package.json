@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "python3 -m http.server 8777 --directory web",
     "test": "node --test tests/model.test.mjs",
-    "test:browser": "node tests/browser.cjs"
+    "test:browser": "node tests/browser.cjs && node tests/browser-regressions.cjs",
+    "test:pwa": "node tests/pwa-update.cjs"
   },
   "devDependencies": {
     "@playwright/test": "1.58.2"

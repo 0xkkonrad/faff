@@ -1,0 +1,29 @@
+{
+  "reviewer":"browser_qa independent verifier",
+  "target_sha":"85ed1badf10fba2ac735915d460a4e2ee692da4a",
+  "kill_list":"/tmp/waffle-qa-20260922/kill-list.md",
+  "kill_list_outcome":"Read in full; no named dated ruling closes either performance candidate.",
+  "verdicts":[
+    {
+      "candidate":"Unchanged focus/visibility SYNC clones all history and replaces the DOM",
+      "verdict":"CONFIRMED",
+      "severity":"P2",
+      "refutation_attempt":"Checked for an unchanged-state guard in app apply and model updateState; none exists. Reproduced with no active timer and an existing current-day draft, so focus does not need to change the model.",
+      "source":["web/app.js:81-86","web/app.js:291-293","web/model.js:129","web/storage.js:35-36"],
+      "evidence":"Generated a valid 1826-day fixture containing 21900 completed sessions; reloaded app, applied 4x Chromium CPU throttle, and dispatched four focus events. Each replaced the root header node. Event-to-sync-completion times were 188.9,176.1,169.2,169.9ms. Each called structuredClone once for all 1826 days, costing 75.3,71.8,62.7,62.6ms respectively.",
+      "scope":"Performance cost scales with saved history; measured long-history scenario, not a claim that new-user sync is slow.",
+      "artifact":"/tmp/waffle-qa-20260922/browser/perf-verification-evidence.json"
+    },
+    {
+      "candidate":"Idle timer repeatedly writes an identical document title four times per second",
+      "verdict":"CONFIRMED",
+      "severity":"P3",
+      "refutation_attempt":"Checked whether the browser suppresses no-op document.title changes. A MutationObserver on title received eight childList mutations in 2100ms while no timer was active; every resulting title was Waffle.",
+      "source":["web/app.js:117","web/app.js:316"],
+      "evidence":"Fresh idle planning view emitted eight identical title writes over 2.1 seconds. Source ticks every 250ms and has no title equality guard, although the countdown text already has an equality guard.",
+      "scope":"Confirmed unnecessary DOM work; no battery or perceptible latency impact independently established.",
+      "artifact":"/tmp/waffle-qa-20260922/browser/perf-verification-evidence.json"
+    }
+  ],
+  "script":"/tmp/waffle-qa-20260922/browser/perf-verify.cjs"
+}

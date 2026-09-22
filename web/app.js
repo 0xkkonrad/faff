@@ -1,4 +1,4 @@
-import { dateKey, validateState } from './model.js';
+import { dateKey, validDate, validateState } from './model.js';
 import { change, restoreBackup } from './storage.js';
 import { render, escape, homeDate, clock } from './view.js';
 import { logo } from './icons.js';
@@ -6,16 +6,21 @@ import { logo } from './icons.js';
 const root = document.querySelector('#waffle-app');
 const fileInput = document.querySelector('#backup-file');
 const standalone = matchMedia('(display-mode: standalone)');
+const selectedDay = validDate(history.state?.date) ? history.state.date : dateKey();
 const ui = {
-  page: location.hash === '#calendar' ? 'calendar' : 'home', selectedDay: dateKey(), month: dateKey().slice(0, 7),
+  page: pageFromHash(), selectedDay, month: selectedDay.slice(0, 7),
   sheet: null, toast: null, standalone: standalone.matches || navigator.standalone === true,
   installReady: false, updateReady: false, notificationSupported: 'Notification' in window && 'serviceWorker' in navigator,
   wakeLockSupported: Boolean(navigator.wakeLock), alertsPending: false,
   permission: 'Notification' in window ? Notification.permission : 'denied', protected: false,
 };
 let state, busy = false, toastTimer, installPrompt, registration, backup, audio, wakeLock, wakePending = false, reloading = false;
-let currentDate = dateKey(), returnFocus, pendingSync = false;
+let currentDate = dateKey(), returnFocus, pendingSync = false, pendingRevision = 0;
 const channel = 'BroadcastChannel' in window ? new BroadcastChannel('waffle-sync-v1') : null;
+
+function pageFromHash() {
+  return ['#calendar', '#history'].includes(location.hash) ? location.hash.slice(1) : 'home';
+}
 
 function focusKey(element) {
   if (!element?.matches('button')) return null;
@@ -24,12 +29,22 @@ function focusKey(element) {
 
 function paint() {
   if (!state) return;
+  if (ui.sheet?.date) {
+    const day = state.days[ui.sheet.date];
+    if (!day || (ui.sheet.type === 'correct' && !day.sessions.some(session => session.id === ui.sheet.id))) ui.sheet = null;
+  }
   const focus = focusKey(document.activeElement), scroll = root.querySelector('.app-body')?.scrollTop || 0;
+  const action = document.activeElement?.dataset.action;
+  const sheetScroll = root.querySelector('.app-sheet')?.scrollTop || 0;
+  const sessionsScroll = root.querySelector('.session-list')?.scrollTop || 0;
   const hadDialog = !!root.querySelector('[role=dialog]');
   root.innerHTML = render(state, ui);
   const body = root.querySelector('.app-body');
   if (body) body.scrollTop = scroll;
   const dialog = root.querySelector('[role=dialog]');
+  if (dialog) dialog.scrollTop = sheetScroll;
+  const sessions = root.querySelector('.session-list');
+  if (sessions) sessions.scrollTop = sessionsScroll;
   root.querySelector('.app-header').inert = !!dialog;
   body.inert = !!dialog;
   const dock = root.querySelector('.session-dock');
@@ -39,6 +54,14 @@ function paint() {
   else if (target && !target.closest('[inert]')) target.focus({ preventScroll: true });
   else if (!dialog && hadDialog && returnFocus) root.querySelector(returnFocus)?.focus({ preventScroll: true });
   else if (dialog) dialog.focus({ preventScroll: true });
+  else if (focus) {
+    const nextAction = { commit: 'start', start: 'pause', pause: 'resume', resume: 'pause' }[action];
+    const next = (nextAction && root.querySelector(`[data-action="${nextAction}"]`)) || root.querySelector('[data-grade], .app-body .primary');
+    next?.focus({ preventScroll: true });
+  }
+  const status = document.querySelector('#session-status');
+  const announcement = state.active?.phase === 'review' ? 'Session finished. Rate your session as focused or waffle.' : '';
+  if (status.textContent !== announcement) status.textContent = announcement;
   tick();
   void maintainWakeLock();
 }
@@ -73,17 +96,31 @@ function publishRevision() {
   try { localStorage.setItem('waffle-revision', String(state.revision)); } catch { /* IndexedDB remains the source of truth. */ }
 }
 
-async function apply(action, after) {
+function flushSync() {
+  const needed = pendingSync || pendingRevision > (state?.revision ?? -1);
+  pendingSync = false;
+  pendingRevision = 0;
+  if (needed) void sync();
+}
+
+function syncRevision(revision) {
+  if (revision <= (state?.revision ?? -1)) return;
+  if (busy) pendingRevision = Math.max(pendingRevision, revision);
+  else void sync();
+}
+
+async function apply(action, after, refresh = false) {
   if (busy) return false;
   busy = true;
   root.setAttribute('aria-busy', 'true');
   try {
     const output = await change(action);
+    const needsPaint = !state || state.revision !== output.state.revision || refresh || action.type !== 'SYNC';
     state = output.state;
     if (output.changed) publishRevision();
     if (ui.toast?.undo && ui.toast.undo.expectedRevision !== state.revision) ui.toast = null;
     after?.(output);
-    paint();
+    if (needsPaint) paint();
     for (const event of output.events) void finished(event);
     return true;
   } catch (error) {
@@ -96,14 +133,15 @@ async function apply(action, after) {
   } finally {
     busy = false;
     root.removeAttribute('aria-busy');
-    if (pendingSync) { pendingSync = false; void sync(); }
+    flushSync();
   }
 }
 
 function sync() {
   if (busy) { pendingSync = true; return Promise.resolve(false); }
+  const previousPermission = ui.permission;
   if ('Notification' in window) ui.permission = Notification.permission;
-  return apply({ type: 'SYNC' });
+  return apply({ type: 'SYNC' }, null, previousPermission !== ui.permission);
 }
 
 function storageError(error) {
@@ -114,7 +152,8 @@ function tick() {
   if (!state) return;
   const label = clock(state.active);
   root.querySelectorAll('.live-clock').forEach(element => { if (element.textContent !== label) element.textContent = label; });
-  document.title = state.active ? state.active.phase === 'review' ? 'Rate your session · Waffle' : `${label} · Waffle` : 'Waffle';
+  const title = state.active ? state.active.phase === 'review' ? 'Rate your session · Waffle' : `${label} · Waffle` : 'Waffle';
+  if (document.title !== title) document.title = title;
   if (!busy && (dateKey() !== currentDate || state.active?.phase === 'running' && state.active.deadline <= Date.now())) {
     currentDate = dateKey();
     void sync();
@@ -231,7 +270,7 @@ root.addEventListener('click', async event => {
         } catch { toast('Notifications could not be enabled.'); }
         finally {
           ui.alertsPending = false; paint();
-          if (pendingSync && !busy) { pendingSync = false; void sync(); }
+          if (!busy) flushSync();
         }
       }
       break;
@@ -252,7 +291,7 @@ root.addEventListener('click', async event => {
       busy = true;
       try { state = (await restoreBackup(backup)).state; backup = null; ui.sheet = null; publishRevision(); navigate('home'); toast('backup restored'); }
       catch (error) { toast(error.message); }
-      finally { busy = false; if (pendingSync) { pendingSync = false; void sync(); } }
+      finally { busy = false; flushSync(); }
       break;
     case 'update': registration?.waiting?.postMessage({ type: 'ACTIVATE_UPDATE' }); break;
   }
@@ -264,7 +303,7 @@ fileInput.addEventListener('change', async () => {
   try {
     if (file.size > 10 * 1024 * 1024) throw new Error('This backup is too large.');
     const value = JSON.parse(await file.text());
-    if (value.kind !== 'waffle-backup') throw new Error('Choose a Waffle backup file.');
+    if (value?.kind !== 'waffle-backup') throw new Error('Choose a Waffle backup file.');
     backup = structuredClone(validateState(value.data));
     openSheet('restore');
   } catch (error) { toast(error instanceof SyntaxError ? 'This file is not a valid backup.' : error.message); }
@@ -282,12 +321,12 @@ document.addEventListener('keydown', event => {
 });
 
 window.addEventListener('popstate', () => {
-  ui.sheet = null; ui.page = location.hash === '#calendar' ? 'calendar' : location.hash === '#history' ? 'history' : 'home';
+  ui.sheet = null; ui.page = pageFromHash();
   if (history.state?.date) { ui.selectedDay = history.state.date; ui.month = ui.selectedDay.slice(0, 7); }
   paint();
 });
-channel?.addEventListener('message', event => { if (!state || event.data > state.revision) void sync(); });
-window.addEventListener('storage', event => { if (event.key === 'waffle-revision' && Number(event.newValue) > (state?.revision ?? -1)) void sync(); });
+channel?.addEventListener('message', event => syncRevision(Number(event.data)));
+window.addEventListener('storage', event => { if (event.key === 'waffle-revision') syncRevision(Number(event.newValue)); });
 window.addEventListener('focus', () => { if (state) void sync(); });
 window.addEventListener('pageshow', () => { if (state) void sync(); });
 document.addEventListener('visibilitychange', () => { if (!document.hidden) void sync(); void maintainWakeLock(); });
@@ -314,4 +353,4 @@ async function registerWorker() {
 await sync();
 void registerWorker();
 if (navigator.storage?.persisted) navigator.storage.persisted().then(value => { ui.protected = value; }).catch(() => {});
-setInterval(tick, 250);
+setInterval(tick, 1000);

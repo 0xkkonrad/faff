@@ -40,6 +40,7 @@ With the local server running:
 npm test
 npx playwright install chromium
 npm run test:browser
+npm run test:pwa
 ```
 
 If using another port, set the browser test URL:
@@ -48,7 +49,9 @@ If using another port, set the browser test URL:
 WAFFLE_URL=http://localhost:8765/ npm run test:browser
 ```
 
-GitHub Actions runs both suites. They cover timer recovery, daily limits, ratings, corrections, streaks, midnight rollover, offline use, backups, concurrent windows, and mobile layouts. Browser screenshots and test backups go into the ignored `artifacts/qa/` directory.
+GitHub Actions runs all three commands. They cover timer recovery, daily limits, ratings, corrections, streaks, midnight rollover, offline use, backups, concurrent windows, keyboard focus, mobile layouts, and service-worker updates with running, paused, and completed timers. Browser screenshots and test backups go into the ignored `artifacts/qa/` directory.
+
+After `npx playwright install webkit`, run the UI regressions in WebKit with `WAFFLE_BROWSER=webkit node tests/browser-regressions.cjs`. To test migration from a prior release, set `WAFFLE_PREVIOUS_WEB` to its `web/` directory when running `npm run test:pwa`.
 
 ## Saved data and Android behavior
 
@@ -64,7 +67,7 @@ The live app is currently published by [the website repository](https://github.c
 
 To release an update:
 
-1. Run both test suites and bump the `waffle-shell-…` cache name in `web/sw.js` when a cached asset changes.
+1. Run all checks above and bump the `waffle-shell-…` cache name in `web/sw.js` when a cached asset changes.
 2. Copy the contents of `web/` into the website repository’s `static/waffle/` directory.
 3. Commit and push the website change to `master`. Its existing Deploy workflow publishes GitHub Pages.
 4. Verify the live app, its offline reload, and the update flow. The new worker waits until an existing user chooses “update available”; saved timer state survives that reload.
@@ -75,4 +78,4 @@ The manifest and service worker resolve paths relative to the app, so production
 
 The app uses the round bitten Waffle logo, IBM Plex Mono, and the Butter palette. IBM Plex Mono’s license is included in [web/fonts/OFL.txt](web/fonts/OFL.txt).
 
-This repository starts from the deployed Waffle files in website commit [`0577663`](https://github.com/0xkkonrad/0xkkonrad.github.io/commit/057766359c39f825e4e006d94a738267c8b32f14), including the settings controls update. The app files are unchanged; test paths were adjusted for the standalone layout.
+This repository started from the deployed Waffle files in website commit [`0577663`](https://github.com/0xkkonrad/0xkkonrad.github.io/commit/057766359c39f825e4e006d94a738267c8b32f14), including the settings controls update. Subsequent changes and verification are recorded in [the QA report](docs/qa-2026-09-22.md).
