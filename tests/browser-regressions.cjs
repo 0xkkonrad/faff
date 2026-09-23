@@ -91,6 +91,7 @@ async function run(name, fn, width, height) {
         await page.keyboard.press('Tab');
         assert(await dialog.evaluate(node => node.contains(document.activeElement)), 'Focus escaped the modal');
       }
+      await page.locator('[data-action=sounds]').click();
       await page.locator('[data-setting=sound]').focus();
       const checked = await page.locator('[data-setting=sound]').getAttribute('aria-checked');
       await page.keyboard.press('Space');

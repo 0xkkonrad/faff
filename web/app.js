@@ -146,7 +146,7 @@ async function apply(action, after, refresh = false) {
     if (!state) storageError(error);
     else {
       try { state = (await change()).state; } catch { /* Keep the last saved view if storage is unavailable. */ }
-      toast(error.message || 'That change could not be saved.');
+      toast(error.message || 'Couldn’t save changes.');
     }
     return false;
   } finally {
@@ -164,7 +164,7 @@ function sync() {
 }
 
 function storageError(error) {
-  root.innerHTML = `<div class="loading-screen">${logo('mascot')}<p>Faff could not open your saved data.<br>${escape(error.message || 'Device storage is unavailable.')}</p><button class="primary" data-action="retry">retry</button></div>`;
+  root.innerHTML = `<div class="loading-screen">${logo('mascot')}<p>Couldn’t load saved data.<br>${escape(error.message || 'Storage unavailable.')}</p><button class="primary" data-action="retry">retry</button></div>`;
 }
 
 function tick() {
@@ -173,7 +173,7 @@ function tick() {
   if (ui.audioReady !== sounds.ready) { ui.audioReady = sounds.ready; paint(); return; }
   const label = clock(state.active);
   root.querySelectorAll('.live-clock').forEach(element => { if (element.textContent !== label) element.textContent = label; });
-  const title = state.active ? state.active.phase === 'review' ? 'Rate your session · Faff' : `${label} · Faff` : 'Faff';
+  const title = state.active ? state.active.phase === 'review' ? 'Rate session · Faff' : `${label} · Faff` : 'Faff';
   if (document.title !== title) document.title = title;
   if (!busy && (dateKey() !== currentDate || state.active?.phase === 'running' && state.active.deadline <= Date.now())) {
     currentDate = dateKey();
@@ -236,7 +236,7 @@ async function finished(event) {
   if (state.settings.alerts && ui.permission === 'granted' && document.hidden) {
     try {
       const worker = await navigator.serviceWorker.ready;
-      await worker.showNotification('Focused?', { body: 'Your 30 minutes are up. Rate your session.', icon: './icons/icon-192.png', tag: `faff-${event.id}`, data: { url: new URL('./', location.href).href } });
+      await worker.showNotification('Focused?', { body: 'Session finished.', icon: './icons/icon-192.png', tag: `faff-${event.id}`, data: { url: new URL('./', location.href).href } });
     } catch { /* Review is saved even if Android declines the alert. */ }
   }
 }
@@ -271,8 +271,7 @@ root.addEventListener('click', async event => {
   if (data.grade) {
     await apply({ type: data.correction ? 'CORRECT' : 'RATE', date, id: data.correction || data.session, grade: data.grade }, output => {
       ui.sheet = null;
-      if (data.correction) toast('rating updated');
-      else toast(data.grade === 'focus' ? 'focused' : 'faff', output.undo);
+      if (!data.correction) toast(data.grade === 'focus' ? 'focused' : 'faff', output.undo);
     });
     return;
   }
@@ -285,7 +284,7 @@ root.addEventListener('click', async event => {
   }
   if (data.setting) {
     if (data.setting === 'sound' && !state.settings.sound) void unlockAudio(true);
-    if (data.setting === 'keepAwake' && !navigator.wakeLock) { toast('This browser cannot keep the screen on.'); return; }
+    if (data.setting === 'keepAwake' && !navigator.wakeLock) { toast('Unavailable in this browser.'); return; }
     await apply({ type: 'SETTING', key: data.setting, value: !state.settings[data.setting] }); return;
   }
   switch (data.action) {
@@ -297,12 +296,12 @@ root.addEventListener('click', async event => {
     case 'settings': openSheet('settings'); break;
     case 'sounds': openSheet('sounds'); break;
     case 'enable-sound':
-      if (!await unlockAudio(true)) toast('Sound could not start. Try again in this browser.');
+      if (!await unlockAudio(true)) toast('Couldn’t play sound. Try again.');
       else paint();
       break;
     case 'preview-chime':
       if (await unlockAudio(true)) sounds.chime(state.settings);
-      else toast('Sound could not start. Try again in this browser.');
+      else toast('Couldn’t play sound. Try again.');
       break;
     case 'preview-ambience':
       if (ui.previewing) { stopPreview(); paint(); }
@@ -310,7 +309,7 @@ root.addEventListener('click', async event => {
         ui.previewing = true;
         sounds.previewAmbience(state.settings, () => { ui.previewing = false; paint(); });
         paint();
-      } else toast('Sound could not start. Try again in this browser.');
+      } else toast('Couldn’t play sound. Try again.');
       break;
     case 'targets': openSheet('targets', { date, mode: data.mode, draft: { focus: day.focus, faff: day.faff } }); break;
     case 'save-plan': await apply({ type: 'TARGETS', date, ...ui.sheet.draft }, () => { ui.sheet = null; }); break;
@@ -337,8 +336,7 @@ root.addEventListener('click', async event => {
           try { ui.permission = await Notification.requestPermission(); }
           finally { busy = false; }
           if (ui.permission === 'granted') await apply({ type: 'SETTING', key: 'alerts', value: true });
-          else if (ui.permission === 'default') toast('Notifications weren’t enabled.');
-        } catch { toast('Notifications could not be enabled.'); }
+        } catch { toast('Couldn’t enable notifications.'); }
         finally {
           ui.alertsPending = false; paint();
           if (!busy) flushSync();
@@ -346,8 +344,11 @@ root.addEventListener('click', async event => {
       }
       break;
     case 'protect':
-      try { ui.protected = await navigator.storage?.persist?.() || false; toast(ui.protected ? 'local saves protected' : 'Download a backup to keep another copy.'); }
-      catch { toast('Download a backup to keep another copy.'); }
+      try {
+        ui.protected = await navigator.storage?.persist?.() || false;
+        if (ui.protected) paint();
+        else toast('Couldn’t protect saves. Download a backup.');
+      } catch { toast('Couldn’t protect saves. Download a backup.'); }
       break;
     case 'export': {
       if (!await sync()) break;
@@ -392,11 +393,11 @@ fileInput.addEventListener('change', async () => {
   const file = fileInput.files[0]; fileInput.value = '';
   if (!file) return;
   try {
-    if (file.size > 10 * 1024 * 1024) throw new Error('This backup is too large.');
+    if (file.size > 10 * 1024 * 1024) throw new Error('Backup too large.');
     const value = JSON.parse(await file.text());
     backup = readBackup(value);
     openSheet('restore');
-  } catch (error) { toast(error instanceof SyntaxError ? 'This file is not a valid backup.' : error.message); }
+  } catch (error) { toast(error instanceof SyntaxError ? 'Invalid backup file.' : error.message); }
 });
 
 document.addEventListener('keydown', event => {
@@ -439,7 +440,7 @@ async function registerWorker() {
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       if (ui.updateReady && !reloading) { reloading = true; location.reload(); }
     });
-  } catch { toast('Offline setup failed. Reopen Faff when you’re online.'); }
+  } catch { toast('Offline setup failed. Reopen when online.'); }
 }
 
 await sync();

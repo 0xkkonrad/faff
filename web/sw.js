@@ -1,4 +1,4 @@
-const CACHE = 'faff-shell-v5';
+const CACHE = 'faff-shell-v6';
 const SCOPE = new URL(self.registration.scope);
 const SHELL = [
   './', './index.html', './app.js', './model.js', './storage.js', './migration.js', './view.js', './icons.js',

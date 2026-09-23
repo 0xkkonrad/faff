@@ -154,6 +154,8 @@ async function volume(page, key, value) {
   await expect(page.locator('[data-setting=ambienceVolume]')).toHaveValue('40');
   await page.locator('[data-setting=ambience]').focus();
   await page.keyboard.press('Tab');
+  await expect(page.locator('[data-action=preview-ambience]')).toBeFocused();
+  await page.keyboard.press('Tab');
   await expect(page.locator('[data-setting=ambienceVolume]')).toBeFocused();
   await volume(page, 'ambienceVolume', 0);
   await expect(page.locator('[data-action=preview-ambience]')).toBeDisabled();

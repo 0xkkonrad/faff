@@ -82,6 +82,8 @@ The manifest and service worker resolve paths relative to the app, so production
 
 ## Design and provenance
 
+Keep app copy to short labels, recovery instructions, and consequences the controls cannot show. Avoid helper paragraphs that explain visible controls or repeat the current state. Preserve accessible names and live announcements.
+
 The app uses the provisional 01A Loose end mark, IBM Plex Mono, and a paper, graphite, and citron palette. The [logo picker](https://kkonrad.com/faff/brand/index.html) contains 10 directions with 5 SVG variations each. Run `npm run build:brand` to regenerate the catalog and provisional SVG, then `node scripts/build-icons.cjs` to regenerate install icons. IBM Plex Mono’s license is included in [web/fonts/OFL.txt](web/fonts/OFL.txt).
 
 This repository started from the deployed timer files in website commit [`0577663`](https://github.com/0xkkonrad/0xkkonrad.github.io/commit/057766359c39f825e4e006d94a738267c8b32f14), including the settings controls update. Subsequent changes and verification are recorded in [the QA report](docs/qa-2026-09-22.md).

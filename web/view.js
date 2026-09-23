@@ -34,8 +34,8 @@ function home(state, ui, currentStreak) {
   const date = homeDate(state), day = state.days[date], active = state.active, counts = totals(day);
   if (!day.committedAt) return `<main class="app-body planning"><div class="page-title"><h1>today.</h1><span>30 min each</span></div><div class="plan-mascot">${logo('mascot')}</div>${planFields(day, 'draft')}<div class="app-bottom">${primary(`commit · ${hours(day.focus + day.faff)}`, 'commit', 'check')}<button class="text-button" data-action="day-off">day off</button></div></main>`;
   const previousDay = date !== dateKey() ? `<p class="previous-date">${labelDate(date)}</p>` : '';
-  if (active?.phase === 'review') return `<main class="app-body rating-page"><div class="rating-center">${previousDay}<div class="countdown">00:00</div><h1>focused?</h1></div><div class="rating-bottom">${gradeButtons(`data-session="${escape(active.id)}"`)}${budget(state, day, ui)}</div></main>`;
-  if (day.endedAt) return `<main class="app-body result-page"><div class="result-center">${logo('result-mascot')}<h1>${day.off ? 'day off.' : 'day done.'}</h1>${day.off ? '' : budget(state, day, ui)}<p>${day.off ? `${currentStreak} day streak · held` : result(day) === 'met' ? `${currentStreak} day streak` : day.sessions.length === day.focus + day.faff ? 'daily limit reached' : 'focus target missed'}</p></div><div class="app-bottom">${primary('calendar', 'calendar', 'calendar')}</div></main>`;
+  if (active?.phase === 'review') return `<main class="app-body rating-page"><div class="rating-center">${previousDay}<div class="countdown">00:00</div><h1 class="sr-only">rate session</h1></div><div class="rating-bottom">${gradeButtons(`data-session="${escape(active.id)}"`)}${budget(state, day, ui)}</div></main>`;
+  if (day.endedAt) return `<main class="app-body result-page"><div class="result-center">${logo('result-mascot')}<h1>${day.off ? 'day off.' : 'day done.'}</h1>${day.off ? '' : budget(state, day, ui)}<p>${day.off ? 'streak held' : result(day) === 'met' ? `${currentStreak} day streak` : day.sessions.length === day.focus + day.faff ? 'daily limit reached' : 'focus target missed'}</p></div><div class="app-bottom">${primary('calendar', 'calendar', 'calendar')}</div></main>`;
   const action = active?.phase === 'running' ? 'pause' : active?.phase === 'paused' ? 'resume' : 'start';
   const wantsSound = (state.settings.sound && state.settings.soundVolume > 0) || (state.settings.ambience !== 'off' && state.settings.ambienceVolume > 0);
   const enableSound = active?.phase === 'running' && wantsSound && !ui.audioReady;
@@ -71,70 +71,69 @@ function calendar(state, ui, currentStreak) {
 function history(state, ui) {
   const day = state.days[ui.selectedDay];
   if (!day) return `<main class="app-body history-page">${back('calendar')}<p class="empty-history">no sessions yet</p></main>${dock(state)}`;
-  return `<main class="app-body history-page"><div class="back-row">${back('calendar', labelDate(ui.selectedDay))}<span>sessions</span></div>${day.off ? '' : budget(state, day, ui)}<div class="session-list">${day.sessions.map((session, index) => `<button class="session-row" data-correct="${escape(session.id)}" data-date="${day.date}" aria-label="Edit session ${index + 1}, ${session.grade}"><small>${String(index + 1).padStart(2, '0')}</small><span><i class="cell ${session.grade}"></i>${session.grade === 'focus' ? 'focused' : 'faff'}</span><small>30m</small>${icon('edit')}</button>`).join('') || `<p class="empty-history">${day.off ? 'day off' : 'no sessions yet'}</p>`}${day.partials.map(partial => `<div class="session-row incomplete-row"><small>-</small><span>unfinished</span><small>${Math.floor(partial.durationMs / 60000)}m</small></div>`).join('')}</div></main>${dock(state)}`;
+  return `<main class="app-body history-page"><div class="back-row">${back('calendar', labelDate(ui.selectedDay))}<span>sessions</span></div>${day.off ? '' : budget(state, day, ui)}<div class="session-list">${day.sessions.map((session, index) => `<button class="session-row" data-correct="${escape(session.id)}" data-date="${day.date}" aria-label="Edit session ${index + 1}, ${session.grade}"><small>${String(index + 1).padStart(2, '0')}</small><span><i class="cell ${session.grade}"></i>${session.grade === 'focus' ? 'focused' : 'faff'}</span>${icon('edit')}</button>`).join('') || `<p class="empty-history">${day.off ? 'day off' : 'no sessions yet'}</p>`}${day.partials.map(partial => `<div class="session-row incomplete-row"><small>-</small><span>unfinished</span><small>${Math.floor(partial.durationMs / 60000)}m</small></div>`).join('')}</div></main>${dock(state)}`;
 }
 
 function settings(state, ui) {
-  const alertHint = !ui.notificationSupported ? 'Not supported in this browser.'
-    : ui.permission === 'denied' ? 'Blocked. Allow notifications in browser settings.'
+  const alertHint = !ui.notificationSupported ? 'Unavailable in this browser.'
+    : ui.permission === 'denied' ? 'Allow notifications in browser settings.'
     : ui.alertsPending ? 'Waiting for permission…' : '';
   const switches = [
-    { key: 'sound', label: 'session sound', checked: state.settings.sound },
     { key: 'keepAwake', label: 'keep screen on', checked: state.settings.keepAwake && ui.wakeLockSupported,
-      hint: ui.wakeLockSupported ? 'While the timer runs.' : 'Not supported in this browser.', disabled: !ui.wakeLockSupported },
-    { key: 'alerts', label: 'timer alerts', checked: state.settings.alerts && ui.permission === 'granted', hint: alertHint,
+      hint: ui.wakeLockSupported ? '' : 'Unavailable in this browser.', disabled: !ui.wakeLockSupported },
+    { key: 'alerts', label: 'notifications', checked: state.settings.alerts && ui.permission === 'granted', hint: alertHint,
       disabled: !ui.notificationSupported || ui.permission === 'denied' || ui.alertsPending },
   ];
-  return `<div class="settings-list">${row('sounds and volume', 'sounds')}<div class="settings-toggles">${switches.map(({ key, label, checked, hint, disabled }) => `<button type="button" class="setting-switch" role="switch" aria-checked="${checked}" aria-labelledby="setting-${key}-label" ${hint ? `aria-describedby="setting-${key}-hint"` : ''} ${key === 'alerts' ? 'data-action="alerts"' : `data-setting="${key}"`} ${disabled ? 'disabled' : ''} ${key === 'alerts' && ui.alertsPending ? 'aria-busy="true"' : ''}><span class="setting-label"><span id="setting-${key}-label">${label}</span>${hint ? `<small id="setting-${key}-hint">${hint}</small>` : ''}</span><span class="switch-box" aria-hidden="true">${icon('check')}</span></button>`).join('')}</div><p class="setting-note">Alerts may be delayed when Android suspends Faff.</p><div class="settings-actions">${row(ui.protected ? 'device storage protected' : 'protect local saves', 'protect', ui.protected)}${row('download backup', 'export')}${row('restore backup', 'import')}</div><p class="setting-note">Saved on this device. No account or sync.</p></div>`;
+  return `<div class="settings-list">${row('sounds', 'sounds')}<div class="settings-toggles">${switches.map(({ key, label, checked, hint, disabled }) => `<button type="button" class="setting-switch" role="switch" aria-checked="${checked}" aria-labelledby="setting-${key}-label" ${hint ? `aria-describedby="setting-${key}-hint"` : ''} ${key === 'alerts' ? 'data-action="alerts"' : `data-setting="${key}"`} ${disabled ? 'disabled' : ''} ${key === 'alerts' && ui.alertsPending ? 'aria-busy="true"' : ''}><span class="setting-label"><span id="setting-${key}-label">${label}</span>${hint ? `<small id="setting-${key}-hint">${hint}</small>` : ''}</span><span class="switch-box" aria-hidden="true">${icon('check')}</span></button>`).join('')}</div><div class="settings-actions">${row(ui.protected ? 'saves protected' : 'protect local saves', 'protect', ui.protected)}${row('download backup', 'export')}${row('restore backup', 'import')}</div><p class="setting-note">Saved on this device only.</p></div>`;
 }
 
 function sounds(state, ui) {
   const settings = state.settings;
-  const choices = (key, label, options) => `<label class="sound-choice" for="${key}"><span>${label}</span><select id="${key}" data-setting="${key}">${Object.entries(options).map(([value, name]) => `<option value="${value}" ${settings[key] === value ? 'selected' : ''}>${name}</option>`).join('')}</select></label>`;
-  const volume = (key, label) => `<div class="sound-volume"><label for="${key}">${label}<output for="${key}">${settings[key]}%</output></label><input id="${key}" data-setting="${key}" type="range" min="0" max="100" step="5" value="${settings[key]}" aria-valuetext="${settings[key]} percent"></div>`;
-  return `<div class="sound-controls"><div class="sound-section"><button class="setting-switch" data-setting="sound" role="switch" aria-checked="${settings.sound}"><span class="setting-label">session sound<small>When your 30 minutes are up.</small></span><span class="switch-box" aria-hidden="true">${icon('check')}</span></button>${choices('chime', 'finish with', CHIMES)}${volume('soundVolume', 'chime volume')}<button class="sound-preview" data-action="preview-chime" ${!settings.sound || !settings.soundVolume ? 'disabled' : ''}>${icon('play')}preview chime</button></div><div class="sound-section">${choices('ambience', 'background', AMBIENCES)}${volume('ambienceVolume', 'background volume')}<button class="sound-preview" data-action="preview-ambience" aria-pressed="${ui.previewing}" ${settings.ambience === 'off' || !settings.ambienceVolume ? 'disabled' : ''}>${icon(ui.previewing ? 'pause' : 'play')}${ui.previewing ? 'stop preview' : 'preview · 5 seconds'}</button><p class="setting-note">Plays during a session. Pauses with the timer.</p></div><p class="setting-note">Sounds work offline. Your browser may stop audio when the app is closed or your phone is locked.</p></div>`;
+  const choices = (key, label, options, preview, previewLabel, disabled, pressed) => `<div class="sound-choice"><label for="${key}">${label}</label><select id="${key}" data-setting="${key}">${Object.entries(options).map(([value, name]) => `<option value="${value}" ${settings[key] === value ? 'selected' : ''}>${name}</option>`).join('')}</select><button class="sound-preview" data-action="${preview}" aria-label="${previewLabel}" ${disabled ? 'disabled' : ''} ${pressed === undefined ? '' : `aria-pressed="${pressed}"`}>${icon(pressed ? 'pause' : 'play')}</button></div>`;
+  const volume = (key, label) => `<div class="sound-volume"><label class="sr-only" for="${key}">${label}</label><input id="${key}" data-setting="${key}" type="range" min="0" max="100" step="5" value="${settings[key]}" aria-valuetext="${settings[key]} percent"><output for="${key}">${settings[key]}%</output></div>`;
+  return `<div class="sound-controls"><div class="sound-section"><button class="setting-switch" data-setting="sound" role="switch" aria-checked="${settings.sound}"><span class="setting-label">session end</span><span class="switch-box" aria-hidden="true">${icon('check')}</span></button>${choices('chime', 'chime', CHIMES, 'preview-chime', 'Preview chime', !settings.sound || !settings.soundVolume)}${volume('soundVolume', 'Chime volume')}</div><div class="sound-section">${choices('ambience', 'background', AMBIENCES, 'preview-ambience', ui.previewing ? 'Stop preview' : 'Preview background sound', settings.ambience === 'off' || !settings.ambienceVolume, ui.previewing)}${volume('ambienceVolume', 'Background volume')}</div></div>`;
 }
 
-function sheet(state, ui, currentStreak) {
+function sheet(state, ui) {
   if (!ui.sheet) return '';
   const { type } = ui.sheet, date = ui.sheet.date || homeDate(state), day = state.days[date];
   let title = '', content = '';
   if (type === 'options') {
     title = date === dateKey() ? 'today' : labelDate(date);
-    content = `<div class="locked-heading">${icon('check')}<span>${day.committedAt ? 'committed' : 'draft'} · ${hours(day.focus + day.faff)}</span></div><div class="locked-row"><span>focus</span><strong>${day.focus} × 30m</strong></div><div class="locked-row"><span>faff</span><strong>${day.faff} × 30m</strong></div><div class="sheet-links">${day.committedAt && !day.off ? row('edit sessions', 'targets') : ''}${row('sessions', 'history')}${row('end day', 'end', !day.committedAt || !!day.endedAt || state.active?.phase === 'running' || state.active?.phase === 'review')}${row('sounds', 'sounds')}${!ui.standalone ? row('install faff', 'install') : ''}${row('settings', 'settings')}${ui.updateReady ? row('update available', 'update') : ''}</div>`;
+    content = `<div class="sheet-links">${day.committedAt && !day.off ? row('edit plan', 'targets') : ''}${row('sessions', 'history')}${row('end day', 'end', !day.committedAt || !!day.endedAt || state.active?.phase === 'running' || state.active?.phase === 'review')}${row('sounds', 'sounds')}${!ui.standalone ? row('install', 'install') : ''}${row('settings', 'settings')}${ui.updateReady ? row('update available', 'update') : ''}</div>`;
   }
   if (type === 'targets') {
-    title = 'today’s plan';
+    title = 'plan';
     const draft = ui.sheet.draft, min = minimumTotal(state, date), active = state.active?.date === date ? state.active : null;
-    content = `${planFields(draft, 'targets', min, ui.sheet.mode)}<p class="adjust-note">${day.sessions.length} completed${active ? active.phase === 'review' ? ' · 1 to rate' : ' · 1 in progress' : ''}</p>${primary(`save · ${hours(draft.focus + draft.faff)}`, 'save-plan', '', draft.focus + draft.faff < min)}`;
+    content = `${planFields(draft, 'targets', min, ui.sheet.mode)}${day.sessions.length || active ? `<p class="adjust-note">${day.sessions.length} completed${active ? active.phase === 'review' ? ' · 1 to rate' : ' · 1 in progress' : ''}</p>` : ''}${primary(`save · ${hours(draft.focus + draft.faff)}`, 'save-plan', '', draft.focus + draft.faff < min)}`;
   }
   if (type === 'off') {
     title = 'day off?';
-    content = `${logo('sheet-mascot')}<p class="sheet-note">${currentStreak} day streak · held</p>${primary('commit day off', 'confirm-off', 'check')}`;
+    content = `${logo('sheet-mascot')}<p class="sheet-note">streak held</p>${primary('confirm', 'confirm-off', 'check')}`;
   }
   if (type === 'end') {
     title = 'end day?';
     const counts = totals(day), partial = state.active?.date === date ? SESSION_MS - remaining(state.active) : 0;
-    content = `${budget(state, day, ui)}<p class="sheet-note">${counts.focus >= day.focus && counts.faff <= day.faff ? 'focus target met' : 'focus target missed'}${partial ? `<br><span class="muted">${Math.floor(partial / 60000)}m unfinished · not counted</span>` : ''}</p>${primary('end day', 'confirm-end', 'check')}`;
+    content = `${budget(state, day, ui)}<p class="sheet-note">${counts.focus >= day.focus && counts.faff <= day.faff ? 'target met' : 'target missed'}${partial ? `<br><span class="muted">${Math.floor(partial / 60000)}m unfinished · not counted</span>` : ''}</p>${primary('end day', 'confirm-end', 'check')}`;
   }
   if (type === 'correct') {
     title = `session ${day.sessions.findIndex(session => session.id === ui.sheet.id) + 1}`;
-    content = `<p class="sheet-note">${labelDate(date)}${day.endedAt ? ' · updates the streak' : ''}</p>${gradeButtons(`data-correction="${escape(ui.sheet.id)}" data-date="${date}"`)}`;
+    content = `<p class="sheet-note">${labelDate(date)}</p>${gradeButtons(`data-correction="${escape(ui.sheet.id)}" data-date="${date}"`)}`;
   }
   if (type === 'settings') { title = 'settings'; content = settings(state, ui); }
   if (type === 'sounds') { title = 'sounds'; content = sounds(state, ui); }
   if (type === 'install') {
-    title = 'install faff';
-    content = `<p class="sheet-note">${ui.installReady ? 'Add Faff to your home screen.' : 'Open your browser menu and choose “Add to Home screen” or “Install app”.'}</p>${ui.installReady ? primary('install', 'install-now') : ''}`;
+    title = 'install';
+    content = ui.installReady ? primary('install', 'install-now') : '<p class="sheet-note">Browser menu → “Add to Home screen” or “Install app”.</p>';
   }
   if (type === 'restore') {
     title = 'restore backup?';
-    content = `<p class="sheet-note">Replace this device’s history with the selected backup?</p>${primary('restore backup', 'confirm-restore')}`;
+    content = `<p class="sheet-note">Replaces this device’s data.</p>${primary('restore', 'confirm-restore')}`;
   }
   return `<div class="sheet-backdrop"><section class="app-sheet" role="dialog" aria-modal="true" aria-label="${escape(title)}" tabindex="-1"><div class="sheet-grip"></div><div class="sheet-title"><h2>${title}</h2><button class="icon-button" data-action="close-sheet" aria-label="Close">${icon('close')}</button></div>${content}</section></div>`;
 }
 
 export function render(state, ui) {
   const currentStreak = streak(state);
-  return `<header class="app-header"><button class="wordmark" data-action="home" aria-label="Faff, back to timer">${logo()}<span>faff</span></button><div><button class="icon-button calendar-button" data-action="calendar" aria-label="Calendar, ${currentStreak} day streak">${icon('calendar')}<span class="streak-badge">${currentStreak}</span></button><button class="icon-button" data-action="options" aria-label="Daily plan and options">${icon('more')}</button></div></header>${ui.page === 'calendar' ? calendar(state, ui, currentStreak) : ui.page === 'history' ? history(state, ui) : home(state, ui, currentStreak)}${sheet(state, ui, currentStreak)}${ui.toast && (!ui.sheet || !ui.toast.undo) ? `<div class="app-toast" role="status"><span>${escape(ui.toast.message)}</span>${ui.toast.undo ? '<button data-action="undo">undo</button>' : ''}</div>` : ''}`;
+  return `<header class="app-header"><button class="wordmark" data-action="home" aria-label="Faff, back to timer">${logo()}<span>faff</span></button><div><button class="icon-button calendar-button" data-action="calendar" aria-label="Calendar, ${currentStreak} day streak">${icon('calendar')}<span class="streak-badge">${currentStreak}</span></button><button class="icon-button" data-action="options" aria-label="Daily plan and options">${icon('more')}</button></div></header>${ui.page === 'calendar' ? calendar(state, ui, currentStreak) : ui.page === 'history' ? history(state, ui) : home(state, ui, currentStreak)}${sheet(state, ui)}${ui.toast && (!ui.sheet || !ui.toast.undo) ? `<div class="app-toast" role="status"><span>${escape(ui.toast.message)}</span>${ui.toast.undo ? '<button data-action="undo">undo</button>' : ''}</div>` : ''}`;
 }
