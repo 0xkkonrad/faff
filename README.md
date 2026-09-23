@@ -83,4 +83,4 @@ This repository started from the deployed timer files in website commit [`057766
 
 ## Rebrand migration
 
-Faff uses schema version 2 and a database named `faff`. On first open, it copies and validates the previous installation’s saved plan, history, settings, and active timer. The original database is retained. Existing Faff data is never overwritten by this migration. Backups from either release can be restored; new downloads use the Faff format. Legacy identifiers are isolated in `web/migration.js` and migration tests because existing saves and bookmarks depend on them.
+Faff uses schema version 2 and a database named `faff`. Installed users apply the update through the existing “update available” option. On first open, Faff copies and validates the previous installation’s saved plan, history, settings, and active timer. The original database is retained. Existing Faff data is never overwritten by this migration. Backups from either release can be restored; new downloads use the Faff format. Legacy identifiers are isolated in `web/migration.js` and migration tests because existing saves and bookmarks depend on them.

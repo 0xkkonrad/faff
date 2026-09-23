@@ -1,12 +1,15 @@
 const destination = new URL('../faff/', self.registration.scope);
-self.addEventListener('install', event => event.waitUntil(self.skipWaiting()));
+self.addEventListener('message', event => {
+  if (event.data?.type === 'ACTIVATE_UPDATE') event.waitUntil(self.skipWaiting());
+});
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     await self.clients.claim();
     for (const client of await self.clients.matchAll({ type: 'window' })) {
       if (!client.url.startsWith(self.registration.scope)) continue;
       const previous = new URL(client.url);
-      await client.navigate(destination.href + previous.search + previous.hash);
+      // Activation must finish before a simultaneous app reload can be served.
+      void client.navigate(destination.href + previous.search + previous.hash).catch(() => {});
     }
   })());
 });

@@ -25,13 +25,14 @@ async function saved(page){return page.evaluate(async()=>(await(await import('./
 (async()=>{
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
   const base=`http://127.0.0.1:${server.address().port}`;
-  browser=await (isWebKit?webkit:chromium).launch();
   for(const phase of ['running','paused','review']) {
     deployed=false;
+    browser=await (isWebKit?webkit:chromium).launch();
     const context=await browser.newContext();
     const page=await context.newPage();const errors=[];page.on('pageerror',error=>errors.push(error.message));
     await page.goto(`${base}/waffle/?source=installed#calendar`);
     await page.locator('[data-action=options]').waitFor();
+    await page.waitForFunction(() => navigator.serviceWorker.controller?.state === 'activated');
     await page.evaluate(async phase=>{
       const model=await import('./model.js'),storage=await import('./storage.js');
       const now=Date.now(),start=now-model.SESSION_MS-60000;
@@ -48,17 +49,20 @@ async function saved(page){return page.evaluate(async()=>(await(await import('./
     },phase);
     await page.reload();
     const before=await saved(page);
-    await page.evaluate(async()=>{await navigator.serviceWorker.ready;if(!navigator.serviceWorker.controller)await new Promise(resolve=>navigator.serviceWorker.addEventListener('controllerchange',resolve,{once:true}));});
+    await page.waitForFunction(() => navigator.serviceWorker.controller?.state === 'activated');
     deployed=true;
     await page.evaluate(async()=>{await(await navigator.serviceWorker.getRegistration()).update();});
-    await expect.poll(() => page.url()).toBe(`${base}/faff/?source=installed#calendar`);
+    await page.locator('[data-action=options]').click();
+    await expect(page.locator('[data-action=update]')).toBeVisible();
+    await page.locator('[data-action=update]').click();
+    await expect.poll(() => page.url(), { timeout: 30000 }).toBe(`${base}/faff/?source=installed#calendar`);
     await expect(page.locator('.wordmark')).toHaveText('faff');
     const after=await saved(page);
     assert.equal(after.schemaVersion,2);assert.deepEqual(after.active,before.active);
     const expected=JSON.parse(JSON.stringify(before.days).replaceAll('"waffle"','"faff"'));
     assert.deepEqual(after.days,expected);
     assert(!JSON.stringify(after).includes('waffle'));
-    await page.evaluate(async()=>{await navigator.serviceWorker.ready;if(!navigator.serviceWorker.controller)await new Promise(resolve=>navigator.serviceWorker.addEventListener('controllerchange',resolve,{once:true}));});
+    await page.waitForFunction(() => navigator.serviceWorker.controller?.state === 'activated');
     await page.waitForFunction(() => navigator.serviceWorker.controller?.scriptURL.endsWith('/faff/sw.js'));
     await page.waitForLoadState('networkidle');
     // WebKit's offline emulation fails even for a minimal service worker; disconnect the server instead.
@@ -79,8 +83,10 @@ async function saved(page){return page.evaluate(async()=>(await(await import('./
     const alias=await context.newPage();await alias.goto(`${base}/waffle/`);await alias.waitForURL(`${base}/faff/`);await alias.locator('[data-action=options]').waitFor();
     assert.equal((await saved(alias)).settings.sound,false);
     assert.deepEqual(errors,[]);await context.close();
+    await browser.close();
     console.log(`PASS real legacy worker redirects and migrates ${phase} timer; offline reload, backup import and stale-data protection`);
   }
+  browser=await (isWebKit?webkit:chromium).launch();
   const context=await browser.newContext();const page=await context.newPage();
   await page.goto(`${base}/faff/brand/index.html`);
   await expect(page.locator('[data-choice]')).toHaveCount(50);
