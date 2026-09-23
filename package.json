@@ -1,21 +1,23 @@
 {
-  "name": "waffle-pwa",
+  "name": "faff-pwa",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "A small focus timer with daily session limits and a waffle calendar.",
+  "description": "A small focus timer with daily session limits and a session calendar.",
   "scripts": {
     "dev": "python3 -m http.server 8777 --directory web",
-    "test": "node --test tests/model.test.mjs",
+    "test": "node --test tests/*.test.mjs",
     "test:browser": "node tests/browser.cjs && node tests/browser-regressions.cjs",
-    "test:pwa": "node tests/pwa-update.cjs"
+    "test:pwa": "node tests/pwa-update.cjs",
+    "test:rebrand": "node tests/rebrand.cjs",
+    "build:brand": "node scripts/build-brand.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.58.2"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/0xkkonrad/waffle.git"
+    "url": "https://github.com/0xkkonrad/faff.git"
   },
-  "homepage": "https://kkonrad.com/waffle/"
+  "homepage": "https://kkonrad.com/faff/"
 }

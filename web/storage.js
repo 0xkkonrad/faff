@@ -1,6 +1,7 @@
 import { createState, updateState, validateState } from './model.js';
+import { readLegacyState } from './migration.js';
 
-const DATABASE = 'waffle';
+const DATABASE = 'faff';
 let opening;
 
 function database() {
@@ -9,14 +10,34 @@ function database() {
     const request = indexedDB.open(DATABASE, 1);
     request.onupgradeneeded = () => request.result.createObjectStore('state');
     request.onerror = () => { opening = null; reject(request.error); };
-    request.onblocked = () => { opening = null; reject(new Error('Close another Waffle window, then retry.')); };
+    request.onblocked = () => { opening = null; reject(new Error('Close another Faff window, then retry.')); };
     request.onsuccess = () => {
       const db = request.result;
       db.onversionchange = () => { db.close(); opening = null; };
-      resolve(db);
+      initialize(db).then(() => resolve(db), error => { db.close(); opening = null; reject(error); });
     };
   });
   return opening;
+}
+
+async function initialize(db) {
+  const existing = await new Promise((resolve, reject) => {
+    const request = db.transaction('state', 'readonly').objectStore('state').get('app');
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+  if (existing !== undefined) return;
+  const legacy = await readLegacyState();
+  if (!legacy) return;
+  await new Promise((resolve, reject) => {
+    const transaction = db.transaction('state', 'readwrite');
+    const store = transaction.objectStore('state');
+    const request = store.get('app');
+    // Another tab may have finished migration while the old database was being read.
+    request.onsuccess = () => { if (request.result === undefined) store.put(legacy, 'app'); };
+    transaction.oncomplete = resolve;
+    transaction.onabort = () => reject(transaction.error);
+  });
 }
 
 // A single read/write transaction serializes actions from multiple tabs.
@@ -36,7 +57,7 @@ export async function change(action = { type: 'SYNC' }, now = Date.now()) {
       } catch (error) { failure = error; transaction.abort(); }
     };
     transaction.oncomplete = () => resolve(output);
-    transaction.onabort = () => reject(failure || transaction.error || new Error('Waffle could not save that change.'));
+    transaction.onabort = () => reject(failure || transaction.error || new Error('Faff could not save that change.'));
     transaction.onerror = () => { failure ||= transaction.error; };
   });
 }

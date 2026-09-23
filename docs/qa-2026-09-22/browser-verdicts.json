@@ -1,9 +1,9 @@
 {
   "reviewerLens": "Independent refutation of browser UX/accessibility findings",
   "pinnedSha": "85ed1badf10fba2ac735915d460a4e2ee692da4a",
-  "killList": "/tmp/waffle-qa-20260922/kill-list.md",
+  "killList": "/tmp/faff-qa-20260922/kill-list.md",
   "killListRulingMatches": [],
-  "reproCommand": "node /tmp/waffle-qa-20260922/model/verify-browser.cjs",
+  "reproCommand": "node /tmp/faff-qa-20260922/model/verify-browser.cjs",
   "verdicts": [
     {
       "id": "B1",

@@ -19,16 +19,16 @@ export function validDate(key) {
 }
 
 export function newDay(date, defaults) {
-  return { date, focus: defaults.focus, waffle: defaults.waffle, committedAt: null, endedAt: null, off: false, sessions: [], partials: [] };
+  return { date, focus: defaults.focus, faff: defaults.faff, committedAt: null, endedAt: null, off: false, sessions: [], partials: [] };
 }
 
 export function createState(now = Date.now()) {
-  const defaults = { focus: 8, waffle: 4 };
-  return { schemaVersion: 1, revision: 0, defaults, settings: { sound: true, keepAwake: false, alerts: false }, days: { [dateKey(now)]: newDay(dateKey(now), defaults) }, active: null };
+  const defaults = { focus: 8, faff: 4 };
+  return { schemaVersion: 2, revision: 0, defaults, settings: { sound: true, keepAwake: false, alerts: false }, days: { [dateKey(now)]: newDay(dateKey(now), defaults) }, active: null };
 }
 
 export function totals(day) {
-  return { focus: day.sessions.filter(session => session.grade === 'focus').length, waffle: day.sessions.filter(session => session.grade === 'waffle').length };
+  return { focus: day.sessions.filter(session => session.grade === 'focus').length, faff: day.sessions.filter(session => session.grade === 'faff').length };
 }
 
 export function result(day) {
@@ -36,7 +36,7 @@ export function result(day) {
   if (day.off) return 'off';
   if (!day.endedAt) return 'open';
   const counts = totals(day);
-  return counts.focus >= day.focus && counts.waffle <= day.waffle ? 'met' : 'missed';
+  return counts.focus >= day.focus && counts.faff <= day.faff ? 'met' : 'missed';
 }
 
 export function streak(state, today = dateKey()) {
@@ -65,37 +65,37 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-function validTargets(focus, waffle) {
-  return Number.isInteger(focus) && focus >= 1 && Number.isInteger(waffle) && waffle >= 0 && focus + waffle <= MAX_SESSIONS;
+function validTargets(focus, faff) {
+  return Number.isInteger(focus) && focus >= 1 && Number.isInteger(faff) && faff >= 0 && focus + faff <= MAX_SESSIONS;
 }
 
 export function validateState(state) {
-  assert(state?.schemaVersion === 1, 'This backup uses an unsupported version.');
+  assert(state?.schemaVersion === 2, 'This backup uses an unsupported version.');
   assert(Number.isSafeInteger(state.revision) && state.revision >= 0, 'Invalid saved revision.');
-  assert(validTargets(state.defaults?.focus, state.defaults?.waffle), 'Invalid saved plan.');
+  assert(validTargets(state.defaults?.focus, state.defaults?.faff), 'Invalid saved plan.');
   assert(state.settings && ['sound', 'keepAwake', 'alerts'].every(key => typeof state.settings[key] === 'boolean'), 'Invalid saved settings.');
   assert(state.days && typeof state.days === 'object' && !Array.isArray(state.days) && Object.keys(state.days).length <= 50000, 'Invalid saved days.');
   const ids = new Set();
   const timestamp = value => Number.isFinite(value) && value > 0;
   for (const [date, day] of Object.entries(state.days)) {
     assert(validDate(date) && day.date === date, 'Invalid saved date.');
-    assert(typeof day.off === 'boolean' && (day.off ? day.focus === 0 && day.waffle === 0 : validTargets(day.focus, day.waffle)), 'Invalid daily plan.');
+    assert(typeof day.off === 'boolean' && (day.off ? day.focus === 0 && day.faff === 0 : validTargets(day.focus, day.faff)), 'Invalid daily plan.');
     assert(day.committedAt === null || timestamp(day.committedAt), 'Invalid commitment date.');
     assert(day.endedAt === null || timestamp(day.endedAt), 'Invalid end date.');
     assert(Array.isArray(day.sessions) && day.sessions.length <= MAX_SESSIONS && Array.isArray(day.partials), 'Invalid saved sessions.');
     assert(!day.off || (day.sessions.length === 0 && day.partials.length === 0 && day.committedAt && day.endedAt), 'Invalid day off.');
     assert(day.committedAt || (!day.sessions.length && !day.partials.length && !day.endedAt), 'Uncommitted day contains work.');
-    assert(day.sessions.length <= day.focus + day.waffle, 'Saved sessions exceed the plan.');
+    assert(day.sessions.length <= day.focus + day.faff, 'Saved sessions exceed the plan.');
     for (const session of day.sessions) {
       assert(typeof session.id === 'string' && session.id.length > 0 && session.id.length <= 80 && !ids.has(session.id), 'Invalid session identity.');
       ids.add(session.id);
-      assert(['focus', 'waffle'].includes(session.grade) && session.durationMs === SESSION_MS && timestamp(session.completedAt) && timestamp(session.ratedAt), 'Invalid session rating.');
+      assert(['focus', 'faff'].includes(session.grade) && session.durationMs === SESSION_MS && timestamp(session.completedAt) && timestamp(session.ratedAt), 'Invalid session rating.');
     }
     for (const partial of day.partials) assert(Number.isFinite(partial.durationMs) && partial.durationMs > 0 && partial.durationMs < SESSION_MS && timestamp(partial.endedAt), 'Invalid unfinished session.');
   }
   if (state.active !== null) {
     const active = state.active, day = state.days[active?.date];
-    assert(day?.committedAt && !day.endedAt && !day.off && day.sessions.length < day.focus + day.waffle, 'The active session has no available slot.');
+    assert(day?.committedAt && !day.endedAt && !day.off && day.sessions.length < day.focus + day.faff, 'The active session has no available slot.');
     assert(typeof active.id === 'string' && active.id.length > 0 && active.id.length <= 80 && !ids.has(active.id), 'Invalid active session identity.');
     assert(['running', 'paused', 'review'].includes(active.phase) && timestamp(active.startedAt), 'Invalid active timer.');
     assert(Number.isFinite(active.remainingMs) && active.remainingMs >= 0 && active.remainingMs <= SESSION_MS, 'Invalid timer duration.');
@@ -146,33 +146,33 @@ export function updateState(previous, action = { type: 'SYNC' }, now = Date.now(
     case 'SYNC': break;
     case 'DRAFT':
       assert(date === today && day && !day.committedAt, 'The plan has already been committed.');
-      assert(validTargets(action.focus, action.waffle), 'Choose between 1 and 24 sessions.');
-      day.focus = action.focus; day.waffle = action.waffle;
+      assert(validTargets(action.focus, action.faff), 'Choose between 1 and 24 sessions.');
+      day.focus = action.focus; day.faff = action.faff;
       changed = true; break;
     case 'COMMIT':
       assert(day && date === today && !day.committedAt && !active, 'Finish the current day first.');
-      assert(validTargets(action.focus, action.waffle), 'Choose between 1 and 24 sessions.');
-      day.focus = action.focus; day.waffle = action.waffle; day.committedAt = now;
-      state.defaults = { focus: day.focus, waffle: day.waffle };
+      assert(validTargets(action.focus, action.faff), 'Choose between 1 and 24 sessions.');
+      day.focus = action.focus; day.faff = action.faff; day.committedAt = now;
+      state.defaults = { focus: day.focus, faff: day.faff };
       changed = true; break;
     case 'DAY_OFF':
       assert(day && date === today && !day.committedAt && !active, 'A day off must be set before committing work.');
-      Object.assign(day, { focus: 0, waffle: 0, off: true, committedAt: now, endedAt: now });
+      Object.assign(day, { focus: 0, faff: 0, off: true, committedAt: now, endedAt: now });
       changed = true; break;
     case 'TARGETS': {
       assert(day?.committedAt && !day.off && editable, 'This plan cannot be edited.');
-      assert(validTargets(action.focus, action.waffle), 'Choose between 1 and 24 sessions.');
-      const total = action.focus + action.waffle, previousTotal = day.focus + day.waffle;
+      assert(validTargets(action.focus, action.faff), 'Choose between 1 and 24 sessions.');
+      const total = action.focus + action.faff, previousTotal = day.focus + day.faff;
       assert(total >= minimumTotal(state, date), 'Keep a slot for every completed or active session.');
-      day.focus = action.focus; day.waffle = action.waffle;
+      day.focus = action.focus; day.faff = action.faff;
       if (day.endedAt && total > previousTotal && total > day.sessions.length) day.endedAt = null;
       if (total === day.sessions.length && active?.date !== date) day.endedAt = now;
-      state.defaults = { focus: day.focus, waffle: day.waffle };
+      state.defaults = { focus: day.focus, faff: day.faff };
       changed = true; break;
     }
     case 'START':
       assert(day?.committedAt && !day.endedAt && !day.off && date === today && !active, 'A session is already active, or the day is finished.');
-      assert(day.sessions.length < day.focus + day.waffle, 'Today’s session limit is reached.');
+      assert(day.sessions.length < day.focus + day.faff, 'Today’s session limit is reached.');
       assert(typeof action.id === 'string' && action.id.length > 0 && action.id.length <= 80, 'A session identity is required.');
       state.active = { id: action.id, date, phase: 'running', startedAt: now, deadline: now + SESSION_MS, remainingMs: SESSION_MS, completedAt: null };
       changed = true; break;
@@ -188,16 +188,16 @@ export function updateState(previous, action = { type: 'SYNC' }, now = Date.now(
       changed = true; break;
     case 'RATE': {
       assert(active?.id === action.id && active.phase === 'review', 'This session is not waiting for a rating.');
-      assert(['focus', 'waffle'].includes(action.grade), 'Choose focused or waffle.');
+      assert(['focus', 'faff'].includes(action.grade), 'Choose focused or faff.');
       const owner = editDay(active.date);
       owner.sessions.push({ id: active.id, grade: action.grade, durationMs: SESSION_MS, completedAt: active.completedAt, ratedAt: now });
       state.active = null;
-      if (owner.sessions.length === owner.focus + owner.waffle || owner.date < today) owner.endedAt = now;
+      if (owner.sessions.length === owner.focus + owner.faff || owner.date < today) owner.endedAt = now;
       undo = { date: owner.date, id: active.id, expectedRevision: state.revision + 1 };
       changed = true; break;
     }
     case 'CORRECT': {
-      assert(day && ['focus', 'waffle'].includes(action.grade), 'Invalid rating.');
+      assert(day && ['focus', 'faff'].includes(action.grade), 'Invalid rating.');
       const session = day.sessions.find(item => item.id === action.id);
       assert(session, 'That session is no longer available.');
       session.grade = action.grade; session.ratedAt = now;

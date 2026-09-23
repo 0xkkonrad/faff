@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v7
         with:
           node-version: 24
@@ -22,7 +24,7 @@ jobs:
       - run: npx playwright install --with-deps chromium webkit
       - name: Browser checks
         run: |
-          python3 -m http.server 8777 --directory web > /tmp/waffle-server.log 2>&1 &
+          python3 -m http.server 8777 --directory web > /tmp/faff-server.log 2>&1 &
           trap 'kill $!' EXIT
           for attempt in {1..20}; do
             if curl --fail --silent http://localhost:8777/index.html > /dev/null; then
@@ -31,5 +33,7 @@ jobs:
             sleep 1
           done
           npm run test:browser
-          WAFFLE_BROWSER=webkit node tests/browser-regressions.cjs
+          FAFF_BROWSER=webkit node tests/browser-regressions.cjs
       - run: npm run test:pwa
+      - run: npm run test:rebrand
+      - run: FAFF_BROWSER=webkit npm run test:rebrand

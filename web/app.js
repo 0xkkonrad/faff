@@ -1,9 +1,10 @@
-import { dateKey, validDate, validateState } from './model.js';
+import { dateKey, validDate } from './model.js';
 import { change, restoreBackup } from './storage.js';
 import { render, escape, homeDate, clock } from './view.js';
 import { logo } from './icons.js';
+import { readBackup } from './migration.js';
 
-const root = document.querySelector('#waffle-app');
+const root = document.querySelector('#faff-app');
 const fileInput = document.querySelector('#backup-file');
 const standalone = matchMedia('(display-mode: standalone)');
 const selectedDay = validDate(history.state?.date) ? history.state.date : dateKey();
@@ -16,7 +17,7 @@ const ui = {
 };
 let state, busy = false, toastTimer, installPrompt, registration, backup, audio, wakeLock, wakePending = false, reloading = false;
 let currentDate = dateKey(), returnFocus, pendingSync = false, pendingRevision = 0;
-const channel = 'BroadcastChannel' in window ? new BroadcastChannel('waffle-sync-v1') : null;
+const channel = 'BroadcastChannel' in window ? new BroadcastChannel('faff-sync-v1') : null;
 
 function pageFromHash() {
   return ['#calendar', '#history'].includes(location.hash) ? location.hash.slice(1) : 'home';
@@ -60,7 +61,7 @@ function paint() {
     next?.focus({ preventScroll: true });
   }
   const status = document.querySelector('#session-status');
-  const announcement = state.active?.phase === 'review' ? 'Session finished. Rate your session as focused or waffle.' : '';
+  const announcement = state.active?.phase === 'review' ? 'Session finished. Rate your session as focused or faff.' : '';
   if (status.textContent !== announcement) status.textContent = announcement;
   tick();
   void maintainWakeLock();
@@ -93,7 +94,7 @@ function navigate(page, date) {
 
 function publishRevision() {
   channel?.postMessage(state.revision);
-  try { localStorage.setItem('waffle-revision', String(state.revision)); } catch { /* IndexedDB remains the source of truth. */ }
+  try { localStorage.setItem('faff-revision', String(state.revision)); } catch { /* IndexedDB remains the source of truth. */ }
 }
 
 function flushSync() {
@@ -145,14 +146,14 @@ function sync() {
 }
 
 function storageError(error) {
-  root.innerHTML = `<div class="loading-screen">${logo('mascot')}<p>Waffle could not open your saved data.<br>${escape(error.message || 'Device storage is unavailable.')}</p><button class="primary" data-action="retry">retry</button></div>`;
+  root.innerHTML = `<div class="loading-screen">${logo('mascot')}<p>Faff could not open your saved data.<br>${escape(error.message || 'Device storage is unavailable.')}</p><button class="primary" data-action="retry">retry</button></div>`;
 }
 
 function tick() {
   if (!state) return;
   const label = clock(state.active);
   root.querySelectorAll('.live-clock').forEach(element => { if (element.textContent !== label) element.textContent = label; });
-  const title = state.active ? state.active.phase === 'review' ? 'Rate your session · Waffle' : `${label} · Waffle` : 'Waffle';
+  const title = state.active ? state.active.phase === 'review' ? 'Rate your session · Faff' : `${label} · Faff` : 'Faff';
   if (document.title !== title) document.title = title;
   if (!busy && (dateKey() !== currentDate || state.active?.phase === 'running' && state.active.deadline <= Date.now())) {
     currentDate = dateKey();
@@ -182,7 +183,7 @@ async function finished(event) {
   if (state.settings.alerts && ui.permission === 'granted' && document.hidden) {
     try {
       const worker = await navigator.serviceWorker.ready;
-      await worker.showNotification('Focused?', { body: 'Your 30 minutes are up. Rate your session.', icon: './icons/icon-192.png', tag: `waffle-${event.id}`, data: { url: new URL('./', location.href).href } });
+      await worker.showNotification('Focused?', { body: 'Your 30 minutes are up. Rate your session.', icon: './icons/icon-192.png', tag: `faff-${event.id}`, data: { url: new URL('./', location.href).href } });
     } catch { /* Review is saved even if Android declines the alert. */ }
   }
 }
@@ -210,15 +211,15 @@ root.addEventListener('click', async event => {
   if (data.step) {
     const draft = { ...(data.plan === 'targets' ? ui.sheet.draft : day) };
     draft[data.field] += Number(data.step);
-    if (data.plan === 'targets') { ui.sheet.draft = { focus: draft.focus, waffle: draft.waffle }; paint(); }
-    else await apply({ type: 'DRAFT', date, focus: draft.focus, waffle: draft.waffle });
+    if (data.plan === 'targets') { ui.sheet.draft = { focus: draft.focus, faff: draft.faff }; paint(); }
+    else await apply({ type: 'DRAFT', date, focus: draft.focus, faff: draft.faff });
     return;
   }
   if (data.grade) {
     await apply({ type: data.correction ? 'CORRECT' : 'RATE', date, id: data.correction || data.session, grade: data.grade }, output => {
       ui.sheet = null;
       if (data.correction) toast('rating updated');
-      else toast(data.grade === 'focus' ? 'focused' : 'waffle', output.undo);
+      else toast(data.grade === 'focus' ? 'focused' : 'faff', output.undo);
     });
     return;
   }
@@ -241,9 +242,9 @@ root.addEventListener('click', async event => {
     case 'close-sheet': closeSheet(); break;
     case 'options': openSheet('options', { date: homeDate(state) }); break;
     case 'settings': openSheet('settings'); break;
-    case 'targets': openSheet('targets', { date, mode: data.mode, draft: { focus: day.focus, waffle: day.waffle } }); break;
+    case 'targets': openSheet('targets', { date, mode: data.mode, draft: { focus: day.focus, faff: day.faff } }); break;
     case 'save-plan': await apply({ type: 'TARGETS', date, ...ui.sheet.draft }, () => { ui.sheet = null; }); break;
-    case 'commit': unlockAudio(); await apply({ type: 'COMMIT', date, focus: day.focus, waffle: day.waffle }); break;
+    case 'commit': unlockAudio(); await apply({ type: 'COMMIT', date, focus: day.focus, faff: day.faff }); break;
     case 'day-off': openSheet('off', { date }); break;
     case 'confirm-off': await apply({ type: 'DAY_OFF', date }, () => { ui.sheet = null; }); break;
     case 'start': unlockAudio(); await apply({ type: 'START', date, id: crypto.randomUUID() }); break;
@@ -280,9 +281,9 @@ root.addEventListener('click', async event => {
       break;
     case 'export': {
       if (!await sync()) break;
-      const blob = new Blob([JSON.stringify({ kind: 'waffle-backup', exportedAt: new Date().toISOString(), data: state }, null, 2)], { type: 'application/json' });
+      const blob = new Blob([JSON.stringify({ kind: 'faff-backup', exportedAt: new Date().toISOString(), data: state }, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob), link = document.createElement('a');
-      link.href = url; link.download = `waffle-${dateKey()}.json`; link.click(); setTimeout(() => URL.revokeObjectURL(url), 10000);
+      link.href = url; link.download = `faff-${dateKey()}.json`; link.click(); setTimeout(() => URL.revokeObjectURL(url), 10000);
       break;
     }
     case 'import': fileInput.click(); break;
@@ -303,8 +304,7 @@ fileInput.addEventListener('change', async () => {
   try {
     if (file.size > 10 * 1024 * 1024) throw new Error('This backup is too large.');
     const value = JSON.parse(await file.text());
-    if (value?.kind !== 'waffle-backup') throw new Error('Choose a Waffle backup file.');
-    backup = structuredClone(validateState(value.data));
+    backup = readBackup(value);
     openSheet('restore');
   } catch (error) { toast(error instanceof SyntaxError ? 'This file is not a valid backup.' : error.message); }
 });
@@ -326,7 +326,7 @@ window.addEventListener('popstate', () => {
   paint();
 });
 channel?.addEventListener('message', event => syncRevision(Number(event.data)));
-window.addEventListener('storage', event => { if (event.key === 'waffle-revision') syncRevision(Number(event.newValue)); });
+window.addEventListener('storage', event => { if (event.key === 'faff-revision') syncRevision(Number(event.newValue)); });
 window.addEventListener('focus', () => { if (state) void sync(); });
 window.addEventListener('pageshow', () => { if (state) void sync(); });
 document.addEventListener('visibilitychange', () => { if (!document.hidden) void sync(); void maintainWakeLock(); });
@@ -347,7 +347,7 @@ async function registerWorker() {
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       if (ui.updateReady && !reloading) { reloading = true; location.reload(); }
     });
-  } catch { toast('Offline setup failed. Reopen Waffle when you’re online.'); }
+  } catch { toast('Offline setup failed. Reopen Faff when you’re online.'); }
 }
 
 await sync();

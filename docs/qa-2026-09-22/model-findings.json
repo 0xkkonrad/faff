@@ -11,9 +11,9 @@
       "claim": "Cross-window restore leaves date-bound dialogs pointing at deleted days and crashes rendering.",
       "scenario": "Window A has an unfinished session from yesterday and opens its options dialog. Window B restores a valid backup containing only today. Broadcast synchronization updates A's saved state but preserves ui.sheet.date for yesterday. Rendering that dialog dereferences the now-missing day; error recovery invokes the same renderer and throws again. A continues displaying the obsolete session until the dialog is dismissed or the page reloaded. The same missing-date path exists in targets and correction dialogs.",
       "evidence": "Reproduced with two real Chromium pages sharing an isolated browser context. B completes restore. A emits two pageerrors: Cannot read properties of undefined (reading 'committedAt'), and retains yesterday's options and paused timer.",
-      "reproCommand": "node /tmp/waffle-qa-20260922/model/restore-stale-sheet.cjs",
+      "reproCommand": "node /tmp/faff-qa-20260922/model/restore-stale-sheet.cjs",
       "reproURL": "http://localhost:53682/index.html",
-      "screenshot": "/tmp/waffle-qa-20260922/model/restore-stale-sheet.png",
+      "screenshot": "/tmp/faff-qa-20260922/model/restore-stale-sheet.png",
       "suggestedFix": "Reconcile date-bound UI state after loading a new state; close stale dialogs when their day/session disappears. Keep render guards for optional day references. Add a concurrent-restore browser regression."
     },
     {
@@ -25,16 +25,16 @@
       "claim": "Legal reopening and partial-session actions can exceed the validator's hidden 24-partial limit, preventing end day.",
       "scenario": "Commit a small plan, start, pause after one minute, and end the day. Reduce the ended plan to one slot and increase it to two to reopen. Repeat. The first 24 partial sessions are saved, but the 25th END fails with Invalid saved sessions despite completed sessions remaining zero and the active slot fitting the plan. User must resume and complete a full session or otherwise change workflow to escape the rejected end action.",
       "evidence": "A Node reproduction uses only accepted public model actions and gets END rejected at partial 25 Invalid saved sessions. The MAX_SESSIONS bound is appropriate for completed sessions but inconsistent with partials and the documented reopen behavior.",
-      "reproCommand": "node /tmp/waffle-qa-20260922/model/repro.mjs",
+      "reproCommand": "node /tmp/faff-qa-20260922/model/repro.mjs",
       "suggestedFix": "Separate the partial-history safety bound from the full-session daily allowance, or define and enforce a visible explicit partial limit before START. Preserve existing partial records."
     }
   ],
   "coverage": {
     "baseline": "npm test: 10/10 passed",
-    "read": ["README.md", "web/model.js", "web/storage.js", "web/app.js", "web/view.js", "tests/model.test.mjs", "tests/browser.cjs", "website docs/waffle.md"],
+    "read": ["README.md", "web/model.js", "web/storage.js", "web/app.js", "web/view.js", "tests/model.test.mjs", "tests/browser.cjs", "website docs/faff.md"],
     "exercised": ["Day reopening with partial work", "Repeated end/start transitions", "Cross-window backup replacement with pending prior-day timer and date-bound dialog", "Current atomic transaction and ID-scoped timer protections", "State validation of backups and mutation results", "Historical state growth performance"],
     "performance": {
-      "reproCommand": "node /tmp/waffle-qa-20260922/model/bench.mjs",
+      "reproCommand": "node /tmp/faff-qa-20260922/model/bench.mjs",
       "operation": "validateState(state) plus updateState(state, SYNC), 12 sessions per historical day; Node server CPU averages over 10 repetitions",
       "measurements": [
         {"days":30,"bytes":41828,"averageMs":0.82},

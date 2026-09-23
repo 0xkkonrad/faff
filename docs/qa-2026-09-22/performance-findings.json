@@ -6,15 +6,15 @@
       "claim":"Every no-op SYNC clones and revalidates the entire session history, causing long main-thread work when returning to a mature account.",
       "scenario":"Restore a valid 1,825-day history with 12 sessions per day (2,885,603 JSON bytes), then refocus the page or perform a setting change. Benchmark Chromium with 4x CPU throttling to model a slower mobile CPU.",
       "evidence":"Five-run medians: structuredClone 55.7 ms, updateState SYNC 71.3 ms, storage.change SYNC 139.5 ms, setting change 183.4 ms, calendar string render 25.1 ms. At 3,650 days the corresponding storage timings reach 285.5/400.3 ms. One-year SYNC is 26.3 ms versus 1.2 ms empty. storage.change validates before updateState; updateState clones, scans every day, validates again, and app.apply repaints even when changed=false.",
-      "artifacts":["/tmp/waffle-qa-20260922/performance/bench.cjs","/tmp/waffle-qa-20260922/performance/bench.json"],
+      "artifacts":["/tmp/faff-qa-20260922/performance/bench.cjs","/tmp/faff-qa-20260922/performance/bench.json"],
       "bounded_fix":"Fast-return no-op SYNC before cloning; skip unchanged view repaint while separately handling permission/UI changes. Copy-on-write changed model branches is a further bounded gain; preserve previous-state immutability and session-array/item cloning. Keep untrusted-state validation."
     },
     {
       "id":"P2","severity":"low","file":"web/app.js","line":99,
       "claim":"One change in another window redundantly runs two full history synchronization transactions and two complete repaints in the receiving window.",
-      "scenario":"Open two tabs in the same browser context, increment the focus plan once in tab A, and instrument IDBDatabase.transaction plus #waffle-app childList mutations in tab B.",
+      "scenario":"Open two tabs in the same browser context, increment the focus plan once in tab A, and instrument IDBDatabase.transaction plus #faff-app childList mutations in tab B.",
       "evidence":"Observed exactly two readwrite transactions and two root replacements in tab B for one revision. Both BroadcastChannel and localStorage announce the revision; when the second event arrives during the first transaction, pendingSync becomes true and unconditionally schedules another transaction even after state.revision has caught up. Dispatching visibilitychange/focus/pageshow together similarly causes two unchanged transactions/paints.",
-      "artifacts":["/tmp/waffle-qa-20260922/performance/lifecycle.cjs","/tmp/waffle-qa-20260922/performance/lifecycle.json"],
+      "artifacts":["/tmp/faff-qa-20260922/performance/lifecycle.cjs","/tmp/faff-qa-20260922/performance/lifecycle.json"],
       "bounded_fix":"Queue the highest pending remote revision and recheck after the in-flight transaction; coalesce lifecycle refresh events. Preserve forced resync for time/date changes and notification permission changes."
     },
     {
@@ -22,14 +22,14 @@
       "claim":"The idle application replaces document.title four times per second despite having no active timer or changing title.",
       "scenario":"Leave a fresh uncommitted plan open for three seconds while observing the title element childList mutations.",
       "evidence":"Observed 12 title childList mutations in 3 seconds, zero app paints and zero storage transactions; setInterval is 250 ms unconditionally. The same idle polling continues when no countdown needs updating.",
-      "artifacts":["/tmp/waffle-qa-20260922/performance/lifecycle.cjs","/tmp/waffle-qa-20260922/performance/lifecycle.json"],
+      "artifacts":["/tmp/faff-qa-20260922/performance/lifecycle.cjs","/tmp/faff-qa-20260922/performance/lifecycle.json"],
       "bounded_fix":"Only assign document.title when changed. Reduce idle/paused polling while retaining midnight reconciliation and immediate visibility/focus recovery."
     }
   ],
   "coverage":{
     "benchmarks":"Chromium, 390x844, UTC, 0/365/1825/3650 prior days, 12 sessions/day, 1x and 4x CPU throttle, 5 samples per operation. Synthetic valid histories; CPU throttling is approximate, not real-device latency.",
     "update":"PASS: dynamic scratchpad server served cache versions 1 then 2; two tabs remained v1 while waiting, update button activated v2 in both tabs, previous cache deleted, active timer ID and absolute deadline survived unchanged, offline reload retained running session and v2 shell.",
-    "update_artifacts":["/tmp/waffle-qa-20260922/performance/update.cjs","/tmp/waffle-qa-20260922/performance/update.json"],
+    "update_artifacts":["/tmp/faff-qa-20260922/performance/update.cjs","/tmp/faff-qa-20260922/performance/update.json"],
     "lifecycle":"Observed dual revision notification duplication, clustered resume event duplication, idle title mutations. Source review confirms deadline-based reconciliation and wake-lock release/reacquire on visibility changes; true OS suspension/wake-lock and browser installation prompts were not tested on a physical device."
   }
 }

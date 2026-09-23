@@ -1,7 +1,7 @@
 const fs = require('node:fs');
 const { chromium } = require('@playwright/test');
-const base = process.env.WAFFLE_URL || 'http://localhost:8777/index.html';
-const output = process.env.WAFFLE_QA || 'artifacts/qa';
+const base = process.env.FAFF_URL || 'http://localhost:8777/index.html';
+const output = process.env.FAFF_QA || 'artifacts/qa';
 let browser;
 
 (async () => {
@@ -27,9 +27,9 @@ let browser;
           const date = model.addDays(today, -index);
           const time = new Date(`${date}T09:00:00Z`).getTime();
           state.days[date] = {
-            date, focus: 8, waffle: 4, committedAt: time, endedAt: time + 21600000, off: false, partials: [],
+            date, focus: 8, faff: 4, committedAt: time, endedAt: time + 21600000, off: false, partials: [],
             sessions: Array.from({ length: 12 }, (_, session) => ({
-              id: `session-${date}-${session}`, grade: session < 8 ? 'focus' : 'waffle', durationMs: model.SESSION_MS,
+              id: `session-${date}-${session}`, grade: session < 8 ? 'focus' : 'faff', durationMs: model.SESSION_MS,
               completedAt: time + (session + 1) * model.SESSION_MS, ratedAt: time + (session + 1) * model.SESSION_MS,
             })),
           };

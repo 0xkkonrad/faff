@@ -7,7 +7,7 @@
     "before": {
       "controller": "http://127.0.0.1:39409/sw.js",
       "cacheNames": [
-        "waffle-shell-v2"
+        "faff-shell-v2"
       ],
       "cachedDocument": true
     },
@@ -24,16 +24,16 @@
     "before": {
       "controller": "http://127.0.0.1:37225/sw.js",
       "cacheNames": [
-        "waffle-shell-v2"
+        "faff-shell-v2"
       ],
       "cachedDocument": true
     },
     "controlledFetch": {
       "status": 200,
-      "html": "<!doctype html>\n<html lang=\"en\" data-waffle-app>\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewp"
+      "html": "<!doctype html>\n<html lang=\"en\" data-faff-app>\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewp"
     },
     "reload": "passed",
-    "after": "\nwaffle\n0\n\ntoday.\n30 min each\n\nfocus\n4h\n\n8\n\nwaffle\n2h\n\n4\n\ncommit · 6h\nday off"
+    "after": "\nfaff\n0\n\ntoday.\n30 min each\n\nfocus\n4h\n\n8\n\nfaff\n2h\n\n4\n\ncommit · 6h\nday off"
   },
   {
     "engine": "webkit",
@@ -43,7 +43,7 @@
     "before": {
       "controller": "http://127.0.0.1:35053/sw.js",
       "cacheNames": [
-        "waffle-shell-v3"
+        "faff-shell-v3"
       ],
       "cachedDocument": true
     },
@@ -60,16 +60,16 @@
     "before": {
       "controller": "http://127.0.0.1:43415/sw.js",
       "cacheNames": [
-        "waffle-shell-v3"
+        "faff-shell-v3"
       ],
       "cachedDocument": true
     },
     "controlledFetch": {
       "status": 200,
-      "html": "<!doctype html>\n<html lang=\"en\" data-waffle-app>\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewp"
+      "html": "<!doctype html>\n<html lang=\"en\" data-faff-app>\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewp"
     },
     "reload": "passed",
-    "after": "\nwaffle\n0\n\ntoday.\n30 min each\n\nfocus\n4h\n\n8\n\nwaffle\n2h\n\n4\n\ncommit · 6h\nday off\n"
+    "after": "\nfaff\n0\n\ntoday.\n30 min each\n\nfocus\n4h\n\n8\n\nfaff\n2h\n\n4\n\ncommit · 6h\nday off\n"
   },
   {
     "engine": "webkit",
@@ -111,16 +111,16 @@
     "before": {
       "controller": "http://127.0.0.1:45817/sw.js",
       "cacheNames": [
-        "waffle-shell-v2"
+        "faff-shell-v2"
       ],
       "cachedDocument": true
     },
     "controlledFetch": {
       "status": 200,
-      "html": "<!doctype html>\n<html lang=\"en\" data-waffle-app>\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewp"
+      "html": "<!doctype html>\n<html lang=\"en\" data-faff-app>\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewp"
     },
     "reload": "passed",
-    "after": "waffle\n0\ntoday.\n30 min each\nfocus\n4h\n8\nwaffle\n2h\n4\ncommit · 6h\nday off"
+    "after": "faff\n0\ntoday.\n30 min each\nfocus\n4h\n8\nfaff\n2h\n4\ncommit · 6h\nday off"
   },
   {
     "engine": "chromium",
@@ -130,16 +130,16 @@
     "before": {
       "controller": "http://127.0.0.1:42135/sw.js",
       "cacheNames": [
-        "waffle-shell-v2"
+        "faff-shell-v2"
       ],
       "cachedDocument": true
     },
     "controlledFetch": {
       "status": 200,
-      "html": "<!doctype html>\n<html lang=\"en\" data-waffle-app>\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewp"
+      "html": "<!doctype html>\n<html lang=\"en\" data-faff-app>\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewp"
     },
     "reload": "passed",
-    "after": "waffle\n0\ntoday.\n30 min each\nfocus\n4h\n8\nwaffle\n2h\n4\ncommit · 6h\nday off"
+    "after": "faff\n0\ntoday.\n30 min each\nfocus\n4h\n8\nfaff\n2h\n4\ncommit · 6h\nday off"
   },
   {
     "engine": "chromium",
@@ -149,16 +149,16 @@
     "before": {
       "controller": "http://127.0.0.1:42007/sw.js",
       "cacheNames": [
-        "waffle-shell-v3"
+        "faff-shell-v3"
       ],
       "cachedDocument": true
     },
     "controlledFetch": {
       "status": 200,
-      "html": "<!doctype html>\n<html lang=\"en\" data-waffle-app>\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewp"
+      "html": "<!doctype html>\n<html lang=\"en\" data-faff-app>\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewp"
     },
     "reload": "passed",
-    "after": "waffle\n0\ntoday.\n30 min each\nfocus\n4h\n8\nwaffle\n2h\n4\ncommit · 6h\nday off"
+    "after": "faff\n0\ntoday.\n30 min each\nfocus\n4h\n8\nfaff\n2h\n4\ncommit · 6h\nday off"
   },
   {
     "engine": "chromium",
@@ -168,16 +168,16 @@
     "before": {
       "controller": "http://127.0.0.1:45735/sw.js",
       "cacheNames": [
-        "waffle-shell-v3"
+        "faff-shell-v3"
       ],
       "cachedDocument": true
     },
     "controlledFetch": {
       "status": 200,
-      "html": "<!doctype html>\n<html lang=\"en\" data-waffle-app>\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewp"
+      "html": "<!doctype html>\n<html lang=\"en\" data-faff-app>\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewp"
     },
     "reload": "passed",
-    "after": "waffle\n0\ntoday.\n30 min each\nfocus\n4h\n8\nwaffle\n2h\n4\ncommit · 6h\nday off"
+    "after": "faff\n0\ntoday.\n30 min each\nfocus\n4h\n8\nfaff\n2h\n4\ncommit · 6h\nday off"
   },
   {
     "engine": "chromium",

@@ -1,7 +1,7 @@
-const CACHE = 'waffle-shell-v3';
+const CACHE = 'faff-shell-v4';
 const SCOPE = new URL(self.registration.scope);
 const SHELL = [
-  './', './index.html', './app.js', './model.js', './storage.js', './view.js', './icons.js',
+  './', './index.html', './app.js', './model.js', './storage.js', './migration.js', './view.js', './icons.js',
   './fonts.css', './app.css', './calendar.css', './responsive.css', './logo.svg', './icon.svg',
   './manifest.webmanifest', './fonts/plex-0.woff2', './fonts/plex-1.woff2',
   './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png', './icons/apple-touch-icon.png',
@@ -17,7 +17,7 @@ self.addEventListener('install', event => {
 
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
-    for (const key of await caches.keys()) if (key.startsWith('waffle-shell-') && key !== CACHE) await caches.delete(key);
+    for (const key of await caches.keys()) if (key.startsWith('faff-shell-') && key !== CACHE) await caches.delete(key);
     await self.clients.claim();
   })());
 });

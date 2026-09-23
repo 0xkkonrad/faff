@@ -5,7 +5,7 @@ const path = require('node:path');
 const { chromium, expect } = require('@playwright/test');
 
 const currentRoot = path.resolve(__dirname, '../web');
-const previousRoot = process.env.WAFFLE_PREVIOUS_WEB || currentRoot;
+const previousRoot = process.env.FAFF_PREVIOUS_WEB || currentRoot;
 const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.webmanifest': 'application/manifest+json' };
 let version = 1;
 let browser;
@@ -14,7 +14,7 @@ const server = http.createServer((request, response) => {
   const file = pathname === '/' ? '/index.html' : pathname;
   try {
     let body = fs.readFileSync(path.join(version === 1 ? previousRoot : currentRoot, file));
-    if (file === '/sw.js') body = body.toString().replace(/waffle-shell-[\w-]+/, `waffle-shell-update-test-${version}`);
+    if (file === '/sw.js') body = body.toString().replace(/faff-shell-[\w-]+/, `faff-shell-update-test-${version}`);
     if (file === '/app.js') body = `${body}\nwindow.testShellVersion = ${version};\n`;
     response.writeHead(200, { 'Content-Type': mime[path.extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-store' });
     response.end(body);
@@ -84,7 +84,7 @@ async function snapshot(page) {
     assert.deepEqual(after.state.active, before.state.active, `${phase} timer survives update and offline reload`);
     assert.deepEqual(after.state.days, before.state.days);
     assert.equal(after.version, 2);
-    assert.deepEqual(after.caches, ['waffle-shell-update-test-2']);
+    assert.deepEqual(after.caches, ['faff-shell-update-test-2']);
     assert.deepEqual(errors, []);
     await context.close();
     console.log(`PASS two-window update and offline reload preserve ${phase} timer`);

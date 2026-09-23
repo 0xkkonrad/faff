@@ -1,8 +1,8 @@
-const { [process.env.WAFFLE_BROWSER || 'chromium']: browserType, expect } = require(process.env.WAFFLE_PLAYWRIGHT || '@playwright/test');
+const { [process.env.FAFF_BROWSER || 'chromium']: browserType, expect } = require(process.env.FAFF_PLAYWRIGHT || '@playwright/test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
-const base = process.env.WAFFLE_URL || 'http://localhost:8777/index.html';
-const output = process.env.WAFFLE_QA || 'artifacts/qa/regressions';
+const base = process.env.FAFF_URL || 'http://localhost:8777/index.html';
+const output = process.env.FAFF_QA || 'artifacts/qa/regressions';
 fs.mkdirSync(output, { recursive: true });
 const start = new Date('2026-09-22T09:00:00Z');
 const results = [];
@@ -56,7 +56,7 @@ async function run(name, fn, width, height) {
     await page.clock.fastForward(30 * 60000);
     await expect(page.locator('[data-grade=focus]')).toBeFocused();
     await expect(page.locator('#session-status')).toHaveAttribute('role', 'status');
-    await expect(page.locator('#session-status')).toHaveText('Session finished. Rate your session as focused or waffle.');
+    await expect(page.locator('#session-status')).toHaveText('Session finished. Rate your session as focused or faff.');
     assert(await statusNode.evaluate(node => node === document.querySelector('#session-status')), 'Live region must survive app repaint');
     await page.keyboard.press('Enter');
     await expect(page.locator('[data-action=start]')).toBeFocused();
@@ -127,7 +127,7 @@ async function run(name, fn, width, height) {
     await page.locator('[data-action=options]').click();
     await page.locator('[data-action=settings]').click();
     await page.locator('#backup-file').setInputFiles({ name: 'null.json', mimeType: 'application/json', buffer: Buffer.from('null') });
-    await expect(page.locator('.app-toast')).toHaveText('Choose a Waffle backup file.');
+    await expect(page.locator('.app-toast')).toHaveText('Choose a Faff backup file.');
     await expect(page.locator('[data-action=confirm-restore]')).toHaveCount(0);
     assert.deepEqual(await saved(page), before);
   });
@@ -148,7 +148,7 @@ async function run(name, fn, width, height) {
         const model = await import('./model.js');
         const data = model.createState();
         if (preserve) data.days['2026-09-21'] = model.newDay('2026-09-21', data.defaults);
-        return { kind: 'waffle-backup', data };
+        return { kind: 'faff-backup', data };
       }, preserveDay);
       await second.locator('[data-action=options]').click();
       await second.locator('[data-action=settings]').click();
@@ -165,7 +165,7 @@ async function run(name, fn, width, height) {
   await run('unchanged-sync-preserves-the-view', async ({ page }) => {
     const header = await page.locator('.app-header').elementHandle();
     await page.evaluate(() => new Promise(resolve => {
-      const root = document.querySelector('#waffle-app');
+      const root = document.querySelector('#faff-app');
       const observer = new MutationObserver(() => {
         if (!root.hasAttribute('aria-busy')) { observer.disconnect(); resolve(); }
       });

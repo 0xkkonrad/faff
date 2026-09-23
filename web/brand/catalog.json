@@ -1,0 +1,432 @@
+[
+  {
+    "number": "01",
+    "name": "Loose end",
+    "text": "A little loop, then back to it. A lowercase f drawn in one wandering line.",
+    "wide": false,
+    "variants": [
+      {
+        "id": "01A",
+        "label": "The loop",
+        "file": "logos/faff-01A.svg",
+        "width": 100,
+        "mark": "<path d=\"M44 80V32C44 12 72 15 65 32C60 43 29 33 27 47C24 62 61 46 65 61C69 77 48 77 44 67\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+      },
+      {
+        "id": "01B",
+        "label": "Long way round",
+        "file": "logos/faff-01B.svg",
+        "width": 100,
+        "mark": "<path d=\"M42 80V33C42 13 69 14 67 29C65 42 35 34 30 45C24 59 58 49 65 62C71 74 59 84 49 77\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+      },
+      {
+        "id": "01C",
+        "label": "Little flourish",
+        "file": "logos/faff-01C.svg",
+        "width": 100,
+        "mark": "<path d=\"M42 80V32C42 12 72 15 65 31C58 43 24 37 28 50C33 61 61 44 66 58C71 71 55 79 47 70\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M68 44l9-5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+      },
+      {
+        "id": "01D",
+        "label": "Open loop",
+        "file": "logos/faff-01D.svg",
+        "width": 100,
+        "mark": "<path d=\"M43 80V31C43 15 65 13 68 26M28 46C40 38 67 38 68 51C69 68 44 59 45 71C45 79 58 82 68 72\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+      },
+      {
+        "id": "01E",
+        "label": "Back on track",
+        "file": "logos/faff-01E.svg",
+        "width": 100,
+        "mark": "<path d=\"M42 80V33C42 12 69 15 67 30C64 44 27 32 27 48C27 61 67 45 67 62C67 73 54 76 48 69\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"76\" cy=\"76\" r=\"3\" fill=\"currentColor\"/>"
+      }
+    ]
+  },
+  {
+    "number": "02",
+    "name": "Good company",
+    "text": "Two f’s share a crossbar. A compact monogram with a friendly rhythm.",
+    "wide": false,
+    "variants": [
+      {
+        "id": "02A",
+        "label": "Together",
+        "file": "logos/faff-02A.svg",
+        "width": 100,
+        "mark": "<path d=\"M30 76V32Q30 17 45 22M56 76V32Q56 17 71 22M19 43H72\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+      },
+      {
+        "id": "02B",
+        "label": "Side by side",
+        "file": "logos/faff-02B.svg",
+        "width": 100,
+        "mark": "<path d=\"M28 77V38Q28 20 44 25M57 77V27Q57 12 73 17M18 46H73\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+      },
+      {
+        "id": "02C",
+        "label": "Joined up",
+        "file": "logos/faff-02C.svg",
+        "width": 100,
+        "mark": "<path d=\"M27 77V32Q27 15 45 22M57 77V32Q57 15 75 22M18 43H70Q79 43 79 52\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+      },
+      {
+        "id": "02D",
+        "label": "Leaning in",
+        "file": "logos/faff-02D.svg",
+        "width": 100,
+        "mark": "<g transform=\"skewX(-9) translate(8 0)\"><path d=\"M30 76V32Q30 17 45 22M57 76V32Q57 17 72 22M20 43H73\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></g>"
+      },
+      {
+        "id": "02E",
+        "label": "Mirror pair",
+        "file": "logos/faff-02E.svg",
+        "width": 100,
+        "mark": "<path d=\"M34 77V32Q34 17 49 23M66 77V32Q66 17 51 23M19 44H81\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+      }
+    ]
+  },
+  {
+    "number": "03",
+    "name": "Scenic route",
+    "text": "A wandering path with a clear destination. Less guilt about the detour.",
+    "wide": false,
+    "variants": [
+      {
+        "id": "03A",
+        "label": "One detour",
+        "file": "logos/faff-03A.svg",
+        "width": 100,
+        "mark": "<path d=\"M21 74V31Q21 20 34 20H65Q81 20 81 36Q81 52 64 52H47Q31 52 31 66Q31 79 46 79H62\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"78\" cy=\"79\" r=\"5\" fill=\"currentColor\"/>"
+      },
+      {
+        "id": "03B",
+        "label": "Round trip",
+        "file": "logos/faff-03B.svg",
+        "width": 100,
+        "mark": "<path d=\"M24 73C5 44 31 12 58 21C84 28 87 60 70 74C55 87 31 72 42 57C51 45 69 57 63 67\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"23\" cy=\"75\" r=\"5\" fill=\"currentColor\"/>"
+      },
+      {
+        "id": "03C",
+        "label": "Meander",
+        "file": "logos/faff-03C.svg",
+        "width": 100,
+        "mark": "<path d=\"M18 70C17 47 35 25 45 32C60 42 27 67 43 73C61 80 76 45 80 23\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"80\" cy=\"23\" r=\"5\" fill=\"currentColor\"/>"
+      },
+      {
+        "id": "03D",
+        "label": "Orbit",
+        "file": "logos/faff-03D.svg",
+        "width": 100,
+        "mark": "<path d=\"M75 28C49 3 9 35 25 66C41 94 86 68 71 44C62 27 42 34 40 48\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"40\" cy=\"48\" r=\"5\" fill=\"currentColor\"/>"
+      },
+      {
+        "id": "03E",
+        "label": "Almost there",
+        "file": "logos/faff-03E.svg",
+        "width": 100,
+        "mark": "<path d=\"M19 76V35Q19 20 33 20Q47 20 47 34V65Q47 80 62 80Q77 80 77 65V29\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"77\" cy=\"18\" r=\"5\" fill=\"currentColor\"/>"
+      }
+    ]
+  },
+  {
+    "number": "04",
+    "name": "Daydream",
+    "text": "A small cloud for the moments your mind goes somewhere else.",
+    "wide": false,
+    "variants": [
+      {
+        "id": "04A",
+        "label": "Passing cloud",
+        "file": "logos/faff-04A.svg",
+        "width": 100,
+        "mark": "<path d=\"M24 70C6 64 12 43 27 42C25 19 57 16 63 35C87 25 97 64 76 70Z\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"42\" cy=\"49\" r=\"2.1\" fill=\"currentColor\"/><circle cx=\"59\" cy=\"49\" r=\"2.1\" fill=\"currentColor\"/><path d=\"M44 61Q51 67 58 59\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+      },
+      {
+        "id": "04B",
+        "label": "Head in clouds",
+        "file": "logos/faff-04B.svg",
+        "width": 100,
+        "mark": "<path d=\"M20 70C3 58 16 38 30 42C25 19 51 13 61 33C78 23 91 41 82 53C100 64 77 82 65 73Z\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"42\" cy=\"49\" r=\"2.1\" fill=\"currentColor\"/><circle cx=\"59\" cy=\"49\" r=\"2.1\" fill=\"currentColor\"/><path d=\"M45 61h11\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+      },
+      {
+        "id": "04C",
+        "label": "Drifting",
+        "file": "logos/faff-04C.svg",
+        "width": 100,
+        "mark": "<path d=\"M23 68C7 64 11 41 30 43C27 22 54 18 61 38C83 26 98 59 78 68Z\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M27 81h25M58 81h11\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"42\" cy=\"49\" r=\"2.1\" fill=\"currentColor\"/><circle cx=\"59\" cy=\"49\" r=\"2.1\" fill=\"currentColor\"/><path d=\"M45 61q6 5 12 0\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+      },
+      {
+        "id": "04D",
+        "label": "Cloud f",
+        "file": "logos/faff-04D.svg",
+        "width": 100,
+        "mark": "<path d=\"M24 71C8 64 14 44 29 44C25 23 56 17 62 36C84 25 96 65 77 71Z\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><g transform=\"translate(22 19) scale(.55)\"><path d=\"M46 78V34Q46 17 62 23M34 43H62\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></g>"
+      },
+      {
+        "id": "04E",
+        "label": "Rain check",
+        "file": "logos/faff-04E.svg",
+        "width": 100,
+        "mark": "<path d=\"M23 61C8 54 17 35 30 36C28 16 57 13 62 30C82 23 94 54 76 61Z\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M34 74l-4 8M52 73l-4 8M70 74l-4 8\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+      }
+    ]
+  },
+  {
+    "number": "05",
+    "name": "Little faffer",
+    "text": "An unhurried companion. Soft, odd, and happy to start again.",
+    "wide": false,
+    "variants": [
+      {
+        "id": "05A",
+        "label": "The bean",
+        "file": "logos/faff-05A.svg",
+        "width": 100,
+        "mark": "<path d=\"M26 72C10 59 20 26 40 23C58 12 70 27 72 39C94 55 80 80 61 78C45 89 30 82 26 72Z\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"42\" cy=\"49\" r=\"2.1\" fill=\"currentColor\"/><circle cx=\"59\" cy=\"49\" r=\"2.1\" fill=\"currentColor\"/><path d=\"M44 61Q51 67 58 59\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+      },
+      {
+        "id": "05B",
+        "label": "Flop",
+        "file": "logos/faff-05B.svg",
+        "width": 100,
+        "mark": "<path d=\"M22 73C11 61 21 38 25 29C33 10 50 21 51 35C69 14 87 26 78 47C97 67 70 84 56 78C42 88 25 84 22 73Z\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"42\" cy=\"49\" r=\"2.1\" fill=\"currentColor\"/><circle cx=\"59\" cy=\"49\" r=\"2.1\" fill=\"currentColor\"/><path d=\"M45 61h11\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+      },
+      {
+        "id": "05C",
+        "label": "Pebble",
+        "file": "logos/faff-05C.svg",
+        "width": 100,
+        "mark": "<path d=\"M20 62C18 37 34 18 54 21C77 24 86 52 77 71C69 90 23 87 20 62Z\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"42\" cy=\"49\" r=\"2.1\" fill=\"currentColor\"/><circle cx=\"59\" cy=\"49\" r=\"2.1\" fill=\"currentColor\"/><path d=\"M45 61q6 5 12 0\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+      },
+      {
+        "id": "05D",
+        "label": "Puddle",
+        "file": "logos/faff-05D.svg",
+        "width": 100,
+        "mark": "<path d=\"M14 70C14 54 31 56 32 40C34 19 58 14 68 34C78 53 77 48 87 63C104 86 65 88 49 81C32 90 11 84 14 70Z\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"42\" cy=\"49\" r=\"2.1\" fill=\"currentColor\"/><circle cx=\"59\" cy=\"49\" r=\"2.1\" fill=\"currentColor\"/><path d=\"M45 61q6-4 12 0\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+      },
+      {
+        "id": "05E",
+        "label": "Stretch",
+        "file": "logos/faff-05E.svg",
+        "width": 100,
+        "mark": "<path d=\"M29 78C19 63 30 58 26 41C20 19 39 9 50 22C65 7 82 21 74 41C69 58 88 77 70 84C54 90 40 87 29 78Z\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"42\" cy=\"49\" r=\"2.1\" fill=\"currentColor\"/><circle cx=\"59\" cy=\"49\" r=\"2.1\" fill=\"currentColor\"/><path d=\"M44 60q7 8 14 0\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+      }
+    ]
+  },
+  {
+    "number": "06",
+    "name": "Give it time",
+    "text": "A slightly wonky clock. Thirty minutes, with room to be human.",
+    "wide": false,
+    "variants": [
+      {
+        "id": "06A",
+        "label": "Off centre",
+        "file": "logos/faff-06A.svg",
+        "width": 100,
+        "mark": "<path d=\"M76 26C91 43 82 76 62 81C34 91 13 64 20 42C25 19 55 11 76 26Z\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M51 31v23l15 8\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+      },
+      {
+        "id": "06B",
+        "label": "Half hour",
+        "file": "logos/faff-06B.svg",
+        "width": 100,
+        "mark": "<path d=\"M50 18A32 32 0 1 0 82 50\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M50 18V50H82\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"50\" cy=\"50\" r=\"4\" fill=\"currentColor\"/>"
+      },
+      {
+        "id": "06C",
+        "label": "Time out",
+        "file": "logos/faff-06C.svg",
+        "width": 100,
+        "mark": "<path d=\"M72 23A33 33 0 1 0 82 46\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M44 38v26M59 38v26\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"81\" cy=\"26\" r=\"4\" fill=\"currentColor\"/>"
+      },
+      {
+        "id": "06D",
+        "label": "Soft square",
+        "file": "logos/faff-06D.svg",
+        "width": 100,
+        "mark": "<path d=\"M30 20Q15 21 18 38L21 70Q22 84 39 82L72 78Q86 76 82 59L78 29Q77 16 60 18Z\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M49 32v21l15 9\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+      },
+      {
+        "id": "06E",
+        "label": "Wind down",
+        "file": "logos/faff-06E.svg",
+        "width": 100,
+        "mark": "<path d=\"M77 25C45 8 16 25 18 55C21 85 63 88 77 64C92 36 54 23 40 39C28 52 45 70 57 61\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"57\" cy=\"61\" r=\"4\" fill=\"currentColor\"/>"
+      }
+    ]
+  },
+  {
+    "number": "07",
+    "name": "Paper plans",
+    "text": "A folded note becomes an f. A small plan you can actually keep.",
+    "wide": false,
+    "variants": [
+      {
+        "id": "07A",
+        "label": "Fold",
+        "file": "logos/faff-07A.svg",
+        "width": 100,
+        "mark": "<path d=\"M30 79V21H61L77 37H49V48H66V63H49V79Z\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M61 21v16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+      },
+      {
+        "id": "07B",
+        "label": "Dog ear",
+        "file": "logos/faff-07B.svg",
+        "width": 100,
+        "mark": "<path d=\"M25 79V20H62L77 36V79ZM62 20V37H77\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M43 65V43H61M43 54H56\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+      },
+      {
+        "id": "07C",
+        "label": "Little flag",
+        "file": "logos/faff-07C.svg",
+        "width": 100,
+        "mark": "<path d=\"M30 82V20L77 28L69 56L31 49M32 35L70 42\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+      },
+      {
+        "id": "07D",
+        "label": "Turn the page",
+        "file": "logos/faff-07D.svg",
+        "width": 100,
+        "mark": "<path d=\"M27 78V24Q47 16 69 24V71Q47 63 27 78M69 24L79 30V80Q52 72 27 83\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M42 59V34H57M42 45H55\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+      },
+      {
+        "id": "07E",
+        "label": "Folded f",
+        "file": "logos/faff-07E.svg",
+        "width": 100,
+        "mark": "<path d=\"M25 80V20H76L62 35H43V45H66L52 60H43V80Z\" fill=\"currentColor\"/><path d=\"M62 20v15h14\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\"/>"
+      }
+    ]
+  },
+  {
+    "number": "08",
+    "name": "Pause bloom",
+    "text": "A pause at the centre of a flower. Rest belongs in the day, too.",
+    "wide": false,
+    "variants": [
+      {
+        "id": "08A",
+        "label": "Four petals",
+        "file": "logos/faff-08A.svg",
+        "width": 100,
+        "mark": "<ellipse cx=\"50\" cy=\"29\" rx=\"14\" ry=\"19\" transform=\"rotate(0 50 50)\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3.5\"/><ellipse cx=\"50\" cy=\"29\" rx=\"14\" ry=\"19\" transform=\"rotate(90 50 50)\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3.5\"/><ellipse cx=\"50\" cy=\"29\" rx=\"14\" ry=\"19\" transform=\"rotate(180 50 50)\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3.5\"/><ellipse cx=\"50\" cy=\"29\" rx=\"14\" ry=\"19\" transform=\"rotate(270 50 50)\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3.5\"/><circle cx=\"50\" cy=\"50\" r=\"18\" fill=\"var(--paper, #f7f5ee)\"/><path d=\"M44 43v14M56 43v14\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+      },
+      {
+        "id": "08B",
+        "label": "Six petals",
+        "file": "logos/faff-08B.svg",
+        "width": 100,
+        "mark": "<ellipse cx=\"50\" cy=\"29\" rx=\"10\" ry=\"16\" transform=\"rotate(0 50 50)\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3.5\"/><ellipse cx=\"50\" cy=\"29\" rx=\"10\" ry=\"16\" transform=\"rotate(60 50 50)\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3.5\"/><ellipse cx=\"50\" cy=\"29\" rx=\"10\" ry=\"16\" transform=\"rotate(120 50 50)\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3.5\"/><ellipse cx=\"50\" cy=\"29\" rx=\"10\" ry=\"16\" transform=\"rotate(180 50 50)\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3.5\"/><ellipse cx=\"50\" cy=\"29\" rx=\"10\" ry=\"16\" transform=\"rotate(240 50 50)\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3.5\"/><ellipse cx=\"50\" cy=\"29\" rx=\"10\" ry=\"16\" transform=\"rotate(300 50 50)\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3.5\"/><circle cx=\"50\" cy=\"50\" r=\"18\" fill=\"var(--paper, #f7f5ee)\"/><path d=\"M44 43v14M56 43v14\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+      },
+      {
+        "id": "08C",
+        "label": "Daisy",
+        "file": "logos/faff-08C.svg",
+        "width": 100,
+        "mark": "<ellipse cx=\"50\" cy=\"29\" rx=\"7\" ry=\"16\" transform=\"rotate(0 50 50)\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3.5\"/><ellipse cx=\"50\" cy=\"29\" rx=\"7\" ry=\"16\" transform=\"rotate(45 50 50)\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3.5\"/><ellipse cx=\"50\" cy=\"29\" rx=\"7\" ry=\"16\" transform=\"rotate(90 50 50)\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3.5\"/><ellipse cx=\"50\" cy=\"29\" rx=\"7\" ry=\"16\" transform=\"rotate(135 50 50)\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3.5\"/><ellipse cx=\"50\" cy=\"29\" rx=\"7\" ry=\"16\" transform=\"rotate(180 50 50)\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3.5\"/><ellipse cx=\"50\" cy=\"29\" rx=\"7\" ry=\"16\" transform=\"rotate(225 50 50)\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3.5\"/><ellipse cx=\"50\" cy=\"29\" rx=\"7\" ry=\"16\" transform=\"rotate(270 50 50)\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3.5\"/><ellipse cx=\"50\" cy=\"29\" rx=\"7\" ry=\"16\" transform=\"rotate(315 50 50)\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3.5\"/><circle cx=\"50\" cy=\"50\" r=\"18\" fill=\"var(--paper, #f7f5ee)\"/><path d=\"M44 43v14M56 43v14\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+      },
+      {
+        "id": "08D",
+        "label": "Slow sun",
+        "file": "logos/faff-08D.svg",
+        "width": 100,
+        "mark": "<ellipse cx=\"50\" cy=\"29\" rx=\"4\" ry=\"13\" transform=\"rotate(0 50 50)\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\"/><ellipse cx=\"50\" cy=\"29\" rx=\"4\" ry=\"13\" transform=\"rotate(36 50 50)\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\"/><ellipse cx=\"50\" cy=\"29\" rx=\"4\" ry=\"13\" transform=\"rotate(72 50 50)\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\"/><ellipse cx=\"50\" cy=\"29\" rx=\"4\" ry=\"13\" transform=\"rotate(108 50 50)\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\"/><ellipse cx=\"50\" cy=\"29\" rx=\"4\" ry=\"13\" transform=\"rotate(144 50 50)\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\"/><ellipse cx=\"50\" cy=\"29\" rx=\"4\" ry=\"13\" transform=\"rotate(180 50 50)\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\"/><ellipse cx=\"50\" cy=\"29\" rx=\"4\" ry=\"13\" transform=\"rotate(216 50 50)\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\"/><ellipse cx=\"50\" cy=\"29\" rx=\"4\" ry=\"13\" transform=\"rotate(252 50 50)\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\"/><ellipse cx=\"50\" cy=\"29\" rx=\"4\" ry=\"13\" transform=\"rotate(288 50 50)\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\"/><ellipse cx=\"50\" cy=\"29\" rx=\"4\" ry=\"13\" transform=\"rotate(324 50 50)\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\"/><circle cx=\"50\" cy=\"50\" r=\"18\" fill=\"var(--paper, #f7f5ee)\"/><path d=\"M44 43v14M56 43v14\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+      },
+      {
+        "id": "08E",
+        "label": "Clover",
+        "file": "logos/faff-08E.svg",
+        "width": 100,
+        "mark": "<ellipse cx=\"50\" cy=\"29\" rx=\"16\" ry=\"21\" transform=\"rotate(0 50 50)\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3.5\"/><ellipse cx=\"50\" cy=\"29\" rx=\"16\" ry=\"21\" transform=\"rotate(120 50 50)\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3.5\"/><ellipse cx=\"50\" cy=\"29\" rx=\"16\" ry=\"21\" transform=\"rotate(240 50 50)\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3.5\"/><circle cx=\"50\" cy=\"50\" r=\"18\" fill=\"var(--paper, #f7f5ee)\"/><path d=\"M44 43v14M56 43v14\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+      }
+    ]
+  },
+  {
+    "number": "09",
+    "name": "On a tangent",
+    "text": "Bold f shapes that take one unexpected turn. Built to work at icon size.",
+    "wide": false,
+    "variants": [
+      {
+        "id": "09A",
+        "label": "Cut corner",
+        "file": "logos/faff-09A.svg",
+        "width": 100,
+        "mark": "<path d=\"M27 80V20H78L64 35H44V45H68L54 60H44V80Z\" fill=\"currentColor\"/>"
+      },
+      {
+        "id": "09B",
+        "label": "Round the bend",
+        "file": "logos/faff-09B.svg",
+        "width": 100,
+        "mark": "<path d=\"M27 80V37Q27 17 49 17H75V34H49Q44 34 44 40V45H68V61H44V80Z\" fill=\"currentColor\"/>"
+      },
+      {
+        "id": "09C",
+        "label": "Offset",
+        "file": "logos/faff-09C.svg",
+        "width": 100,
+        "mark": "<path d=\"M25 80V39H42V80ZM25 19H77V35H25ZM45 44H68V60H45Z\" fill=\"currentColor\"/>"
+      },
+      {
+        "id": "09D",
+        "label": "Side step",
+        "file": "logos/faff-09D.svg",
+        "width": 100,
+        "mark": "<path d=\"M25 80V20H77V35H43V45H66V61H43V80Z\" fill=\"currentColor\"/><path d=\"M65 63H80V79H65Z\" fill=\"currentColor\"/>"
+      },
+      {
+        "id": "09E",
+        "label": "Solid loop",
+        "file": "logos/faff-09E.svg",
+        "width": 100,
+        "mark": "<path fill-rule=\"evenodd\" d=\"M24 81V38Q24 16 48 16H58Q79 16 79 35Q79 54 57 54H42V81ZM42 39H58Q63 39 63 35Q63 31 57 31H49Q42 31 42 39Z\" fill=\"currentColor\"/>"
+      }
+    ]
+  },
+  {
+    "number": "10",
+    "name": "Just faff",
+    "text": "Let the name do the work. Five drawn wordmarks, with no extra symbol.",
+    "wide": true,
+    "variants": [
+      {
+        "id": "10A",
+        "label": "Easygoing",
+        "file": "logos/faff-10A.svg",
+        "width": 146,
+        "mark": "<path d=\"M12 69V34Q12 18 27 24M4 42H28M62 47C61 31 36 34 36 53C36 71 61 73 62 53V69M84 69V34Q84 18 99 24M75 42H100M119 69V34Q119 18 134 24M110 42H137\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+      },
+      {
+        "id": "10B",
+        "label": "Forward",
+        "file": "logos/faff-10B.svg",
+        "width": 146,
+        "mark": "<g transform=\"translate(8 0) skewX(-9)\"><path d=\"M12 69V34Q12 18 27 24M4 42H28M62 47C61 31 36 34 36 53C36 71 61 73 62 53V69M84 69V34Q84 18 99 24M75 42H100M119 69V34Q119 18 134 24M110 42H137\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></g>"
+      },
+      {
+        "id": "10C",
+        "label": "Bouncy",
+        "file": "logos/faff-10C.svg",
+        "width": 146,
+        "mark": "<path d=\"M13 71V35Q13 19 27 25M5 44H28M62 51C60 35 36 38 36 56C36 74 61 76 62 56V73M84 67V32Q84 16 99 22M76 40H100M119 72V37Q119 21 134 27M111 46H137\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+      },
+      {
+        "id": "10D",
+        "label": "Underlined",
+        "file": "logos/faff-10D.svg",
+        "width": 146,
+        "mark": "<path d=\"M12 69V34Q12 18 27 24M4 42H28M62 47C61 31 36 34 36 53C36 71 61 73 62 53V69M84 69V34Q84 18 99 24M75 42H100M119 69V34Q119 18 134 24M110 42H137\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M8 86Q67 92 134 82\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+      },
+      {
+        "id": "10E",
+        "label": "A little smile",
+        "file": "logos/faff-10E.svg",
+        "width": 146,
+        "mark": "<path d=\"M12 69V34Q12 18 27 24M4 42H28M62 47C61 31 36 34 36 53C36 71 61 73 62 53V69M84 69V34Q84 18 99 24M75 42H100M119 69V34Q119 18 134 24M110 42H137\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M62 82q21 15 41-1\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"
+      }
+    ]
+  }
+]

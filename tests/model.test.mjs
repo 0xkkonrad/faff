@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import { SESSION_MS, createState, updateState, dateKey, totals, streak, result, remaining, addDays, validateState } from '../web/model.js';
 
 const morning = new Date('2026-09-22T09:00:00').getTime();
-function setup(focus = 8, waffle = 4, now = morning) {
-  return updateState(createState(now), { type: 'COMMIT', focus, waffle }, now).state;
+function setup(focus = 8, faff = 4, now = morning) {
+  return updateState(createState(now), { type: 'COMMIT', focus, faff }, now).state;
 }
 function act(state, action, now = morning) { return updateState(state, action, now).state; }
 function complete(state, id, grade, now = morning) {
@@ -24,11 +24,11 @@ test('pause, persist and resume retain only active elapsed time', () => {
   assert.equal(updateState(output.state, { type: 'SYNC' }, morning + 90 * 60000).events.length, 0);
 });
 
-test('rating converts the completed slot to waffle without extending the ceiling', () => {
+test('rating converts the completed slot to faff without extending the ceiling', () => {
   let state = setup(1, 1);
-  state = complete(state, 'one', 'waffle');
-  state = complete(state, 'two', 'waffle', morning + SESSION_MS);
-  assert.deepEqual(totals(state.days[dateKey(morning)]), { focus: 0, waffle: 2 });
+  state = complete(state, 'one', 'faff');
+  state = complete(state, 'two', 'faff', morning + SESSION_MS);
+  assert.deepEqual(totals(state.days[dateKey(morning)]), { focus: 0, faff: 2 });
   assert.equal(result(state.days[dateKey(morning)]), 'missed');
   assert.equal(state.active, null);
   assert.throws(() => act(state, { type: 'START', id: 'three' }, morning + 2 * SESSION_MS));
@@ -39,16 +39,16 @@ test('edits reserve completed and active slots without resetting the timer', () 
   let state = complete(setup(2, 1), 'one', 'focus');
   state = act(state, { type: 'START', id: 'two' }, morning + SESSION_MS);
   const active = structuredClone(state.active);
-  assert.throws(() => act(state, { type: 'TARGETS', focus: 1, waffle: 0 }, morning + SESSION_MS));
-  state = act(state, { type: 'TARGETS', focus: 1, waffle: 1 }, morning + SESSION_MS);
+  assert.throws(() => act(state, { type: 'TARGETS', focus: 1, faff: 0 }, morning + SESSION_MS));
+  state = act(state, { type: 'TARGETS', focus: 1, faff: 1 }, morning + SESSION_MS);
   assert.deepEqual(state.active, active);
   state = act(state, { type: 'RATE', id: 'two', grade: 'focus' }, morning + 2 * SESSION_MS);
   assert.equal(result(state.days[dateKey(morning)]), 'met');
-  state = act(state, { type: 'TARGETS', focus: 2, waffle: 1 }, morning + 2 * SESSION_MS);
+  state = act(state, { type: 'TARGETS', focus: 2, faff: 1 }, morning + 2 * SESSION_MS);
   assert.equal(state.days[dateKey(morning)].endedAt, null);
 });
 
-test('ending early allows unused waffle and records partial work without a full session', () => {
+test('ending early allows unused faff and records partial work without a full session', () => {
   let state = complete(setup(1, 2), 'one', 'focus');
   state = act(state, { type: 'START', id: 'two' }, morning + SESSION_MS);
   assert.throws(() => act(state, { type: 'END' }, morning + SESSION_MS + 60000));
@@ -77,10 +77,10 @@ test('missed days break streaks, off days hold them, historical corrections reca
   const tomorrow = morning + 86400000, third = morning + 2 * 86400000;
   state = act(state, { type: 'DAY_OFF' }, tomorrow);
   assert.equal(streak(state, dateKey(tomorrow)), 1);
-  state = act(state, { type: 'COMMIT', focus: 1, waffle: 0 }, third);
+  state = act(state, { type: 'COMMIT', focus: 1, faff: 0 }, third);
   state = complete(state, 'three', 'focus', third);
   assert.equal(streak(state, dateKey(third)), 2);
-  state = act(state, { type: 'CORRECT', date: dateKey(morning), id: 'one', grade: 'waffle' }, third + SESSION_MS);
+  state = act(state, { type: 'CORRECT', date: dateKey(morning), id: 'one', grade: 'faff' }, third + SESSION_MS);
   assert.equal(streak(state, dateKey(third)), 1);
   state = act(state, { type: 'SYNC' }, morning + 4 * 86400000);
   assert.equal(streak(state, dateKey(morning + 4 * 86400000)), 0);
@@ -88,7 +88,7 @@ test('missed days break streaks, off days hold them, historical corrections reca
 
 test('undo is scoped to the last revision and returns to mandatory review', () => {
   let state = act(setup(1, 0), { type: 'START', id: 'one' });
-  const rated = updateState(state, { type: 'RATE', id: 'one', grade: 'waffle' }, morning + SESSION_MS);
+  const rated = updateState(state, { type: 'RATE', id: 'one', grade: 'faff' }, morning + SESSION_MS);
   state = act(rated.state, { type: 'UNDO_RATE', ...rated.undo }, morning + SESSION_MS);
   assert.equal(state.active.phase, 'review');
   assert.equal(state.days[dateKey(morning)].sessions.length, 0);
@@ -111,8 +111,8 @@ test('date arithmetic crosses leap days and DST boundaries', () => {
 test('invalid backups and impossible daily limits are rejected', () => {
   const invalid = setup(); invalid.days[dateKey(morning)].focus = -1;
   assert.throws(() => validateState(invalid));
-  assert.throws(() => act(setup(), { type: 'TARGETS', focus: 24, waffle: 1 }));
-  assert.throws(() => act(setup(), { type: 'TARGETS', focus: 0, waffle: 4 }));
+  assert.throws(() => act(setup(), { type: 'TARGETS', focus: 24, faff: 1 }));
+  assert.throws(() => act(setup(), { type: 'TARGETS', focus: 0, faff: 4 }));
   assert.throws(() => act(setup(), { type: 'DAY_OFF' }));
   const duplicate = complete(setup(), 'one', 'focus');
   duplicate.days[dateKey(morning)].sessions.push(structuredClone(duplicate.days[dateKey(morning)].sessions[0]));
@@ -135,22 +135,22 @@ test('state transitions preserve earlier snapshots, including historical correct
     state = freeze(output.state);
     return output;
   }
-  run({ type: 'DRAFT', focus: 2, waffle: 1 });
-  run({ type: 'COMMIT', focus: 2, waffle: 1 });
+  run({ type: 'DRAFT', focus: 2, faff: 1 });
+  run({ type: 'COMMIT', focus: 2, faff: 1 });
   run({ type: 'START', id: 'immutable' });
   run({ type: 'PAUSE', id: 'immutable' }, morning + 60000);
   run({ type: 'RESUME', id: 'immutable' }, morning + 120000);
   const rated = run({ type: 'RATE', id: 'immutable', grade: 'focus' }, morning + SESSION_MS + 60000);
   run({ type: 'UNDO_RATE', ...rated.undo }, morning + SESSION_MS + 60000);
-  run({ type: 'RATE', id: 'immutable', grade: 'waffle' }, morning + SESSION_MS + 60000);
-  run({ type: 'TARGETS', focus: 2, waffle: 2 }, morning + SESSION_MS + 60000);
+  run({ type: 'RATE', id: 'immutable', grade: 'faff' }, morning + SESSION_MS + 60000);
+  run({ type: 'TARGETS', focus: 2, faff: 2 }, morning + SESSION_MS + 60000);
   run({ type: 'START', id: 'partial' }, morning + SESSION_MS + 60000);
   run({ type: 'PAUSE', id: 'partial' }, morning + SESSION_MS + 120000);
   run({ type: 'END' }, morning + SESSION_MS + 120000);
   run({ type: 'DAY_OFF' }, morning + 86400000);
   run({ type: 'CORRECT', date: dateKey(morning), id: 'immutable', grade: 'focus' }, morning + 86400000);
   run({ type: 'SETTING', key: 'sound', value: false }, morning + 86400000);
-  run({ type: 'COMMIT', focus: 1, waffle: 0 }, morning + 2 * 86400000);
+  run({ type: 'COMMIT', focus: 1, faff: 0 }, morning + 2 * 86400000);
   run({ type: 'SYNC' }, morning + 3 * 86400000);
   assert.equal(state.days[dateKey(morning)].sessions[0].grade, 'focus');
   assert.equal(state.days[dateKey(morning)].partials.length, 1);
@@ -166,8 +166,8 @@ test('ending reopened days preserves more than 24 partial sessions', () => {
     state = act(state, { type: 'END' }, now + 60000);
     assert.equal(state.days[dateKey(now)].partials.length, index + 1);
     if (index < 29) {
-      state = act(state, { type: 'TARGETS', focus: 1, waffle: 0 }, now + 60000);
-      state = act(state, { type: 'TARGETS', focus: 2, waffle: 0 }, now + 60000);
+      state = act(state, { type: 'TARGETS', focus: 1, faff: 0 }, now + 60000);
+      state = act(state, { type: 'TARGETS', focus: 2, faff: 0 }, now + 60000);
     }
   }
   assert.equal(state.active, null);
@@ -178,9 +178,9 @@ test('ending reopened days preserves more than 24 partial sessions', () => {
 test('a rejected action cannot modify an earlier state snapshot', () => {
   const state = complete(setup(1, 0), 'duplicate', 'focus');
   const snapshot = structuredClone(state);
-  assert.throws(() => act(state, { type: 'TARGETS', focus: 24, waffle: 1 }));
+  assert.throws(() => act(state, { type: 'TARGETS', focus: 24, faff: 1 }));
   assert.deepEqual(state, snapshot);
-  const reopened = act(state, { type: 'TARGETS', focus: 2, waffle: 0 });
+  const reopened = act(state, { type: 'TARGETS', focus: 2, faff: 0 });
   const reopenedSnapshot = structuredClone(reopened);
   assert.throws(() => act(reopened, { type: 'START', id: 'duplicate' }));
   assert.deepEqual(reopened, reopenedSnapshot);

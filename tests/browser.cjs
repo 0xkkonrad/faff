@@ -1,17 +1,17 @@
-const { [process.env.WAFFLE_BROWSER || 'chromium']: browserType, expect } = require(process.env.WAFFLE_PLAYWRIGHT || '@playwright/test');
+const { [process.env.FAFF_BROWSER || 'chromium']: browserType, expect } = require(process.env.FAFF_PLAYWRIGHT || '@playwright/test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
-const base = process.env.WAFFLE_URL || 'http://localhost:8777/';
-const output = process.env.WAFFLE_QA || 'artifacts/qa';
+const base = process.env.FAFF_URL || 'http://localhost:8777/';
+const output = process.env.FAFF_QA || 'artifacts/qa';
 fs.mkdirSync(output, { recursive: true });
 const start = new Date('2026-09-22T09:00:00Z');
 const browserErrors = [];
 let browser;
 async function saved(page) { return page.evaluate(async () => (await (await import('./storage.js')).change()).state); }
 async function ready(page) { await expect(page.locator('[data-action=commit]')).toBeVisible(); }
-async function choose(page, focus, waffle) {
+async function choose(page, focus, faff) {
   for (let i = 8; i > focus; i--) await page.locator('[data-plan=draft][data-field=focus][data-step="-1"]').click();
-  for (let i = 4; i > waffle; i--) await page.locator('[data-plan=draft][data-field=waffle][data-step="-1"]').click();
+  for (let i = 4; i > faff; i--) await page.locator('[data-plan=draft][data-field=faff][data-step="-1"]').click();
 }
 async function capture(page, name) { await page.screenshot({ path: `${output}/${name}.png` }); }
 async function fresh(width=390, height=844, time=start) {
@@ -54,9 +54,9 @@ async function fresh(width=390, height=844, time=start) {
   await page.clock.fastForward(25*60000);
   await expect(page.locator('[data-grade=focus]')).toBeVisible();
   await capture(page,'rating');
-  await page.locator('[data-grade=waffle]').click();
+  await page.locator('[data-grade=faff]').click();
   await expect(page.locator('[data-action=start]')).toBeVisible();
-  assert.deepEqual((await saved(page)).days['2026-09-22'].sessions.map(x=>x.grade),['waffle']);
+  assert.deepEqual((await saved(page)).days['2026-09-22'].sessions.map(x=>x.grade),['faff']);
   await page.locator('[data-action=undo]').click();
   await expect(page.locator('[data-grade=focus]')).toBeVisible();
   await page.locator('[data-grade=focus]').click();
@@ -64,8 +64,8 @@ async function fresh(width=390, height=844, time=start) {
   assert.equal(await page.locator('[data-day="2026-09-22"] [data-unit=focus]').count(),1);
   await page.locator('.selected-day [data-action=history]').click();
   await page.locator('[data-correct]').click();
-  await page.locator('[data-grade=waffle]').click();
-  await expect(page.locator('.session-list')).toContainText('waffle');
+  await page.locator('[data-grade=faff]').click();
+  await expect(page.locator('.session-list')).toContainText('faff');
   await page.locator('.wordmark').click();
   await page.locator('[data-action=options]').click();
   await page.locator('[data-action=settings]').click();
@@ -79,7 +79,7 @@ async function fresh(width=390, height=844, time=start) {
   });
   const worker = await page.evaluate(async () => ({scope:(await navigator.serviceWorker.ready).scope,keys:await caches.keys()}));
   assert.equal(worker.scope,base);
-  assert(worker.keys.some(key=>key.startsWith('waffle-shell-')));
+  assert(worker.keys.some(key=>key.startsWith('faff-shell-')));
   await context.setOffline(true);
   await page.reload();
   await expect(page.locator('[data-action=start]')).toBeVisible();
@@ -99,10 +99,10 @@ async function fresh(width=390, height=844, time=start) {
       const run=(action,time=now)=>{state=model.updateState(state,action,time).state;};
       if(day===6||day===13||day===20) {run({type:'DAY_OFF'});continue;}
       const count=4+day%9;
-      run({type:'COMMIT',focus:count-2,waffle:2});
+      run({type:'COMMIT',focus:count-2,faff:2});
       for(let index=0;index<count;index++) {
         run({type:'START',id:`fixture-${day}-${index}`},now+index*model.SESSION_MS);
-        run({type:'RATE',id:`fixture-${day}-${index}`,grade:index<count-2?'focus':'waffle'},now+(index+1)*model.SESSION_MS);
+        run({type:'RATE',id:`fixture-${day}-${index}`,grade:index<count-2?'focus':'faff'},now+(index+1)*model.SESSION_MS);
       }
     }
     await storage.restoreBackup(state);
@@ -125,7 +125,7 @@ async function fresh(width=390, height=844, time=start) {
   const exported = await download;
   await exported.saveAs(`${output}/backup.json`);
   const backup = JSON.parse(fs.readFileSync(`${output}/backup.json`,'utf8'));
-  assert.equal(backup.kind,'waffle-backup');
+  assert.equal(backup.kind,'faff-backup');
   await page.locator('#backup-file').setInputFiles({name:'backup.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(backup))});
   await expect(page.locator('[data-action=confirm-restore]')).toBeVisible();
   await page.locator('[data-action=confirm-restore]').click();

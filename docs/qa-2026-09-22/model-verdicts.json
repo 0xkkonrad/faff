@@ -7,7 +7,7 @@
         "Cannot read properties of undefined (reading 'sessions')",
         "Cannot read properties of undefined (reading 'sessions')"
       ],
-      "dialog": "session 121 sept · updates the streakfocusedwaffle",
+      "dialog": "session 121 sept · updates the streakfocusedfaff",
       "history": "01focused30m"
     },
     "afterCorrection": {
@@ -34,6 +34,6 @@
     },
     "failure": "Invalid saved sessions.",
     "actionCount": 124,
-    "scenario": "Commit focus=1 waffle=0. For each partial: start, pass 1 minute, pause, end. Reopen through TARGETS focus=1 then focus=2. On the 25th partial END, validator rejects partials length=25 although model permits another session."
+    "scenario": "Commit focus=1 faff=0. For each partial: start, pass 1 minute, pause, end. Reopen through TARGETS focus=1 then focus=2. On the 25th partial END, validator rejects partials length=25 although model permits another session."
   }
 }
