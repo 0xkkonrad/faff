@@ -33,6 +33,8 @@ jobs:
             sleep 1
           done
           npm run test:browser
+          npm run test:sounds
+          FAFF_BROWSER=webkit npm run test:sounds
           FAFF_BROWSER=webkit node tests/browser-regressions.cjs
       - run: npm run test:pwa
       - run: npm run test:rebrand

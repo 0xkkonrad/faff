@@ -9,6 +9,8 @@ A small focus timer with a daily limit. Plan your focus and faff sessions, work 
 - Adjust the morning plan, commit, and edit the counts by tapping either session counter.
 - Rate each completed session as focused or faff. Both use the same daily allowance.
 - Pause and resume, end early, or correct a past rating.
+- Choose a bell, chime, or double beep for session endings, with a volume control and preview.
+- Play optional brown noise or soft rain during sessions. Background audio pauses with the timer.
 - See each session in the calendar: dark tiles for focus, citron for faff.
 - Build a streak by meeting the focus target within the faff allowance. Planned days off hold the streak.
 - Install on Android, use offline, and download or restore a backup.
@@ -40,6 +42,7 @@ With the local server running:
 npm test
 npx playwright install chromium
 npm run test:browser
+npm run test:sounds
 npm run test:pwa
 npm run test:rebrand
 ```
@@ -50,11 +53,13 @@ If using another port, set the browser test URL:
 FAFF_URL=http://localhost:8765/ npm run test:browser
 ```
 
-GitHub Actions runs all three commands. They cover timer recovery, daily limits, ratings, corrections, streaks, midnight rollover, offline use, backups, concurrent windows, keyboard focus, mobile layouts, and service-worker updates with running, paused, and completed timers. Browser screenshots and test backups go into the ignored `artifacts/qa/` directory.
+GitHub Actions runs these checks. They cover timer recovery, daily limits, ratings, corrections, streaks, midnight rollover, offline use, backups, concurrent windows, keyboard focus, mobile layouts, sound output, and service-worker updates with running, paused, and completed timers. Browser screenshots and test backups go into the ignored `artifacts/qa/` directory.
 
 After `npx playwright install webkit`, run the UI regressions in WebKit with `FAFF_BROWSER=webkit node tests/browser-regressions.cjs`. To test migration from a prior release, set `FAFF_PREVIOUS_WEB` to its `web/` directory when running `npm run test:pwa`.
 
 ## Saved data and Android behavior
+
+Open **sounds** from the timer or the options menu. Session chimes and background audio have separate volume controls. Background audio is off by default; it follows the timer once selected. Previews last five seconds and stop when the sound panel closes. All sounds are generated on the device, work offline, and need no audio downloads. Browsers require a tap to enable audio after reloading a running timer; Faff shows **enable sound** when needed. Browsers with Web Locks play background audio in one Faff window at a time.
 
 Plans, ratings, settings, and the active timer stay in this browser’s IndexedDB. There is no account, backend, analytics, or automatic device sync. Clearing site data removes that device’s history; settings include backup download and restore.
 

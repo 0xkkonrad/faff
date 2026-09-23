@@ -3,6 +3,7 @@ import { change, restoreBackup } from './storage.js';
 import { render, escape, homeDate, clock } from './view.js';
 import { logo } from './icons.js';
 import { readBackup } from './migration.js';
+import { Sounds } from './sounds.js';
 
 const root = document.querySelector('#faff-app');
 const fileInput = document.querySelector('#backup-file');
@@ -14,9 +15,13 @@ const ui = {
   installReady: false, updateReady: false, notificationSupported: 'Notification' in window && 'serviceWorker' in navigator,
   wakeLockSupported: Boolean(navigator.wakeLock), alertsPending: false,
   permission: 'Notification' in window ? Notification.permission : 'denied', protected: false,
+  audioReady: false, previewing: false,
 };
-let state, busy = false, toastTimer, installPrompt, registration, backup, audio, wakeLock, wakePending = false, reloading = false;
+let state, busy = false, toastTimer, installPrompt, registration, backup, wakeLock, wakePending = false, reloading = false;
+const sounds = new Sounds();
+let backgroundOwner = false, soundLockPending = false, releaseSoundLock;
 let currentDate = dateKey(), returnFocus, pendingSync = false, pendingRevision = 0;
+const pendingSettings = new Map();
 const channel = 'BroadcastChannel' in window ? new BroadcastChannel('faff-sync-v1') : null;
 
 function pageFromHash() {
@@ -24,7 +29,7 @@ function pageFromHash() {
 }
 
 function focusKey(element) {
-  if (!element?.matches('button')) return null;
+  if (!element?.matches('button, input, select')) return null;
   return ['action', 'step', 'field', 'plan', 'grade', 'session', 'correction', 'date', 'mode', 'correct', 'day', 'month', 'setting'].map(key => element.dataset[key] === undefined ? '' : `[data-${key}="${CSS.escape(element.dataset[key])}"]`).join('') || null;
 }
 
@@ -75,14 +80,16 @@ function toast(message, undo = null) {
 }
 
 function openSheet(type, details = {}) {
+  if (type !== 'sounds') stopPreview();
   if (!ui.sheet) returnFocus = focusKey(document.activeElement);
   ui.sheet = { type, ...details };
   paint();
 }
 
-function closeSheet() { ui.sheet = null; backup = null; paint(); }
+function closeSheet() { stopPreview(); ui.sheet = null; backup = null; paint(); }
 
 function navigate(page, date) {
+  stopPreview();
   ui.sheet = null;
   ui.page = page;
   if (date) { ui.selectedDay = date; ui.month = date.slice(0, 7); }
@@ -98,6 +105,12 @@ function publishRevision() {
 }
 
 function flushSync() {
+  if (pendingSettings.size) {
+    const [key, value] = pendingSettings.entries().next().value;
+    pendingSettings.delete(key);
+    void apply({ type: 'SETTING', key, value });
+    return;
+  }
   const needed = pendingSync || pendingRevision > (state?.revision ?? -1);
   pendingSync = false;
   pendingRevision = 0;
@@ -117,11 +130,16 @@ async function apply(action, after, refresh = false) {
   try {
     const output = await change(action);
     const needsPaint = !state || state.revision !== output.state.revision || refresh || action.type !== 'SYNC';
+    const completed = output.events.find(event => event.type === 'finished') ||
+      (state?.active?.phase === 'running' && state.active.id === output.state.active?.id && output.state.active.phase === 'review' ? output.state.active : null);
+    if (state?.active?.phase !== output.state.active?.phase) stopPreview();
     state = output.state;
+    if (!state.settings.sound) sounds.stopChime();
     if (output.changed) publishRevision();
     if (ui.toast?.undo && ui.toast.undo.expectedRevision !== state.revision) ui.toast = null;
     after?.(output);
     if (needsPaint) paint();
+    if (completed) void playFinishedSound(completed);
     for (const event of output.events) void finished(event);
     return true;
   } catch (error) {
@@ -151,6 +169,8 @@ function storageError(error) {
 
 function tick() {
   if (!state) return;
+  maintainSounds();
+  if (ui.audioReady !== sounds.ready) { ui.audioReady = sounds.ready; paint(); return; }
   const label = clock(state.active);
   root.querySelectorAll('.live-clock').forEach(element => { if (element.textContent !== label) element.textContent = label; });
   const title = state.active ? state.active.phase === 'review' ? 'Rate your session · Faff' : `${label} · Faff` : 'Faff';
@@ -161,25 +181,58 @@ function tick() {
   }
 }
 
-function unlockAudio() {
-  if (!state?.settings.sound) return;
-  try {
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (AudioContext) { audio ||= new AudioContext(); void audio.resume().catch(() => {}); }
-  } catch { /* The countdown still works without sound. */ }
+async function unlockAudio(force = false) {
+  if (!force && !state?.settings.sound && state?.settings.ambience === 'off') return false;
+  const ready = await sounds.unlock();
+  ui.audioReady = ready;
+  maintainSounds();
+  return ready;
+}
+
+function stopPreview() {
+  sounds.cancelPreview();
+  ui.previewing = false;
+}
+
+function maintainSounds() {
+  if (!state) return;
+  const wanted = sounds.ready && state.active?.phase === 'running' && state.active.deadline > Date.now()
+    && state.settings.ambience !== 'off' && state.settings.ambienceVolume > 0;
+  if (!wanted) {
+    releaseSoundLock?.(); releaseSoundLock = null; backgroundOwner = false;
+    sounds.ambience(state.settings, null);
+    return;
+  }
+  if (!navigator.locks || backgroundOwner) { sounds.ambience(state.settings, state.active); return; }
+  if (soundLockPending) return;
+  // Only one Faff window plays background sound for the shared timer.
+  soundLockPending = true;
+  void navigator.locks.request('faff-background-sound', { ifAvailable: true }, async lock => {
+    if (!lock) return;
+    backgroundOwner = true;
+    const released = new Promise(resolve => { releaseSoundLock = resolve; });
+    maintainSounds();
+    await released;
+  }).catch(() => {}).finally(() => { soundLockPending = false; });
+}
+
+async function playFinishedSound(event) {
+  if (Date.now() - event.completedAt > 60000 || !state.settings.sound || !sounds.ready || !state.settings.soundVolume) return;
+  const play = () => {
+    if (!state.settings.sound || !sounds.ready || !state.settings.soundVolume) return;
+    try {
+      if (localStorage.getItem('faff-last-chime') === event.id) return;
+      localStorage.setItem('faff-last-chime', event.id);
+    } catch { /* Sound still works when browser storage protection blocks localStorage. */ }
+    sounds.chime(state.settings);
+    navigator.vibrate?.([100, 70, 100]);
+  };
+  if (navigator.locks) await navigator.locks.request('faff-session-chime', play).catch(() => {});
+  else play();
 }
 
 async function finished(event) {
   if (Date.now() - event.completedAt > 60000) return;
-  if (state.settings.sound && audio?.state === 'running') {
-    for (const delay of [0, 0.27]) {
-      const oscillator = audio.createOscillator(), gain = audio.createGain(), start = audio.currentTime + delay;
-      oscillator.type = 'sine'; oscillator.frequency.value = 660;
-      gain.gain.setValueAtTime(0, start); gain.gain.linearRampToValueAtTime(0.18, start + 0.02); gain.gain.exponentialRampToValueAtTime(0.001, start + 0.22);
-      oscillator.connect(gain); gain.connect(audio.destination); oscillator.start(start); oscillator.stop(start + 0.24);
-    }
-    navigator.vibrate?.([100, 70, 100]);
-  }
   if (state.settings.alerts && ui.permission === 'granted' && document.hidden) {
     try {
       const worker = await navigator.serviceWorker.ready;
@@ -231,7 +284,7 @@ root.addEventListener('click', async event => {
     ui.month = month.toISOString().slice(0, 7); paint(); return;
   }
   if (data.setting) {
-    unlockAudio();
+    if (data.setting === 'sound' && !state.settings.sound) void unlockAudio(true);
     if (data.setting === 'keepAwake' && !navigator.wakeLock) { toast('This browser cannot keep the screen on.'); return; }
     await apply({ type: 'SETTING', key: data.setting, value: !state.settings[data.setting] }); return;
   }
@@ -242,6 +295,23 @@ root.addEventListener('click', async event => {
     case 'close-sheet': closeSheet(); break;
     case 'options': openSheet('options', { date: homeDate(state) }); break;
     case 'settings': openSheet('settings'); break;
+    case 'sounds': openSheet('sounds'); break;
+    case 'enable-sound':
+      if (!await unlockAudio(true)) toast('Sound could not start. Try again in this browser.');
+      else paint();
+      break;
+    case 'preview-chime':
+      if (await unlockAudio(true)) sounds.chime(state.settings);
+      else toast('Sound could not start. Try again in this browser.');
+      break;
+    case 'preview-ambience':
+      if (ui.previewing) { stopPreview(); paint(); }
+      else if (await unlockAudio(true)) {
+        ui.previewing = true;
+        sounds.previewAmbience(state.settings, () => { ui.previewing = false; paint(); });
+        paint();
+      } else toast('Sound could not start. Try again in this browser.');
+      break;
     case 'targets': openSheet('targets', { date, mode: data.mode, draft: { focus: day.focus, faff: day.faff } }); break;
     case 'save-plan': await apply({ type: 'TARGETS', date, ...ui.sheet.draft }, () => { ui.sheet = null; }); break;
     case 'commit': unlockAudio(); await apply({ type: 'COMMIT', date, focus: day.focus, faff: day.faff }); break;
@@ -298,6 +368,26 @@ root.addEventListener('click', async event => {
   }
 });
 
+root.addEventListener('input', event => {
+  const input = event.target;
+  if (!input.matches('input[type=range][data-setting]') || !state) return;
+  input.setAttribute('aria-valuetext', `${input.value} percent`);
+  input.closest('.sound-volume').querySelector('output').textContent = `${input.value}%`;
+  if (input.dataset.setting === 'ambienceVolume' && (backgroundOwner || ui.previewing || !navigator.locks)) {
+    sounds.playBackground(ui.previewing || state.active?.phase === 'running' ? state.settings.ambience : 'off', Number(input.value));
+  }
+});
+
+root.addEventListener('change', async event => {
+  const input = event.target;
+  if (!input.matches('input[data-setting], select[data-setting]') || !state) return;
+  const key = input.dataset.setting, value = input.type === 'range' ? Number(input.value) : input.value;
+  stopPreview();
+  void unlockAudio(true);
+  if (busy) pendingSettings.set(key, value);
+  else await apply({ type: 'SETTING', key, value });
+});
+
 fileInput.addEventListener('change', async () => {
   const file = fileInput.files[0]; fileInput.value = '';
   if (!file) return;
@@ -313,7 +403,7 @@ document.addEventListener('keydown', event => {
   if (!ui.sheet) return;
   if (event.key === 'Escape') { closeSheet(); event.preventDefault(); }
   if (event.key === 'Tab') {
-    const dialog = root.querySelector('[role=dialog]'), buttons = [...dialog.querySelectorAll('button:not(:disabled)')];
+    const dialog = root.querySelector('[role=dialog]'), buttons = [...dialog.querySelectorAll('button:not(:disabled), input:not(:disabled), select:not(:disabled)')];
     const first = buttons[0], last = buttons.at(-1);
     if (event.shiftKey && (document.activeElement === first || document.activeElement === dialog)) { last?.focus(); event.preventDefault(); }
     else if (!event.shiftKey && (document.activeElement === last || document.activeElement === dialog)) { first?.focus(); event.preventDefault(); }
@@ -321,6 +411,7 @@ document.addEventListener('keydown', event => {
 });
 
 window.addEventListener('popstate', () => {
+  stopPreview();
   ui.sheet = null; ui.page = pageFromHash();
   if (history.state?.date) { ui.selectedDay = history.state.date; ui.month = ui.selectedDay.slice(0, 7); }
   paint();
@@ -329,6 +420,7 @@ channel?.addEventListener('message', event => syncRevision(Number(event.data)));
 window.addEventListener('storage', event => { if (event.key === 'faff-revision') syncRevision(Number(event.newValue)); });
 window.addEventListener('focus', () => { if (state) void sync(); });
 window.addEventListener('pageshow', () => { if (state) void sync(); });
+window.addEventListener('pagehide', () => { stopPreview(); sounds.stop(); releaseSoundLock?.(); releaseSoundLock = null; backgroundOwner = false; });
 document.addEventListener('visibilitychange', () => { if (!document.hidden) void sync(); void maintainWakeLock(); });
 window.addEventListener('beforeinstallprompt', event => { event.preventDefault(); installPrompt = event; ui.installReady = true; paint(); });
 window.addEventListener('appinstalled', () => { installPrompt = null; ui.installReady = false; ui.standalone = true; if (ui.sheet?.type === 'install') ui.sheet = null; paint(); });

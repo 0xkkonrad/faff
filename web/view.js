@@ -1,5 +1,6 @@
 import { SESSION_MS, dateKey, remaining, totals, result, streak, minimumTotal } from './model.js';
 import { icon, logo } from './icons.js';
+import { CHIMES, AMBIENCES } from './sound-settings.js';
 
 export const escape = value => String(value).replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
 export const labelDate = date => new Date(`${date}T12:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' }).toLowerCase();
@@ -36,7 +37,10 @@ function home(state, ui, currentStreak) {
   if (active?.phase === 'review') return `<main class="app-body rating-page"><div class="rating-center">${previousDay}<div class="countdown">00:00</div><h1>focused?</h1></div><div class="rating-bottom">${gradeButtons(`data-session="${escape(active.id)}"`)}${budget(state, day, ui)}</div></main>`;
   if (day.endedAt) return `<main class="app-body result-page"><div class="result-center">${logo('result-mascot')}<h1>${day.off ? 'day off.' : 'day done.'}</h1>${day.off ? '' : budget(state, day, ui)}<p>${day.off ? `${currentStreak} day streak · held` : result(day) === 'met' ? `${currentStreak} day streak` : day.sessions.length === day.focus + day.faff ? 'daily limit reached' : 'focus target missed'}</p></div><div class="app-bottom">${primary('calendar', 'calendar', 'calendar')}</div></main>`;
   const action = active?.phase === 'running' ? 'pause' : active?.phase === 'paused' ? 'resume' : 'start';
-  return `<main class="app-body timer-page"><div class="timer-center">${previousDay}<div class="countdown live-clock" role="timer" aria-label="Time left in this session">${clock(active)}</div>${budget(state, day, ui)}</div><div class="app-bottom">${primary(action, action, action === 'pause' ? 'pause' : 'play')}${!active && counts.focus >= day.focus ? '<button class="text-button" data-action="end">end day</button>' : ''}</div></main>`;
+  const wantsSound = (state.settings.sound && state.settings.soundVolume > 0) || (state.settings.ambience !== 'off' && state.settings.ambienceVolume > 0);
+  const enableSound = active?.phase === 'running' && wantsSound && !ui.audioReady;
+  const soundLink = `<button class="text-button" data-action="${enableSound ? 'enable-sound' : 'sounds'}">${enableSound ? 'enable sound' : `sounds${state.settings.ambience !== 'off' ? ` · ${AMBIENCES[state.settings.ambience]}` : ''}`}</button>`;
+  return `<main class="app-body timer-page"><div class="timer-center">${previousDay}<div class="countdown live-clock" role="timer" aria-label="Time left in this session">${clock(active)}</div>${budget(state, day, ui)}</div><div class="app-bottom">${soundLink}${primary(action, action, action === 'pause' ? 'pause' : 'play')}${!active && counts.focus >= day.focus ? '<button class="text-button" data-action="end">end day</button>' : ''}</div></main>`;
 }
 
 function patch(day) {
@@ -75,13 +79,20 @@ function settings(state, ui) {
     : ui.permission === 'denied' ? 'Blocked. Allow notifications in browser settings.'
     : ui.alertsPending ? 'Waiting for permission…' : '';
   const switches = [
-    { key: 'sound', label: 'sound', checked: state.settings.sound },
+    { key: 'sound', label: 'session sound', checked: state.settings.sound },
     { key: 'keepAwake', label: 'keep screen on', checked: state.settings.keepAwake && ui.wakeLockSupported,
       hint: ui.wakeLockSupported ? 'While the timer runs.' : 'Not supported in this browser.', disabled: !ui.wakeLockSupported },
     { key: 'alerts', label: 'timer alerts', checked: state.settings.alerts && ui.permission === 'granted', hint: alertHint,
       disabled: !ui.notificationSupported || ui.permission === 'denied' || ui.alertsPending },
   ];
-  return `<div class="settings-list"><div class="settings-toggles">${switches.map(({ key, label, checked, hint, disabled }) => `<button type="button" class="setting-switch" role="switch" aria-checked="${checked}" aria-labelledby="setting-${key}-label" ${hint ? `aria-describedby="setting-${key}-hint"` : ''} ${key === 'alerts' ? 'data-action="alerts"' : `data-setting="${key}"`} ${disabled ? 'disabled' : ''} ${key === 'alerts' && ui.alertsPending ? 'aria-busy="true"' : ''}><span class="setting-label"><span id="setting-${key}-label">${label}</span>${hint ? `<small id="setting-${key}-hint">${hint}</small>` : ''}</span><span class="switch-box" aria-hidden="true">${icon('check')}</span></button>`).join('')}</div><p class="setting-note">Alerts may be delayed when Android suspends Faff.</p><div class="settings-actions">${row(ui.protected ? 'device storage protected' : 'protect local saves', 'protect', ui.protected)}${row('download backup', 'export')}${row('restore backup', 'import')}</div><p class="setting-note">Saved on this device. No account or sync.</p></div>`;
+  return `<div class="settings-list">${row('sounds and volume', 'sounds')}<div class="settings-toggles">${switches.map(({ key, label, checked, hint, disabled }) => `<button type="button" class="setting-switch" role="switch" aria-checked="${checked}" aria-labelledby="setting-${key}-label" ${hint ? `aria-describedby="setting-${key}-hint"` : ''} ${key === 'alerts' ? 'data-action="alerts"' : `data-setting="${key}"`} ${disabled ? 'disabled' : ''} ${key === 'alerts' && ui.alertsPending ? 'aria-busy="true"' : ''}><span class="setting-label"><span id="setting-${key}-label">${label}</span>${hint ? `<small id="setting-${key}-hint">${hint}</small>` : ''}</span><span class="switch-box" aria-hidden="true">${icon('check')}</span></button>`).join('')}</div><p class="setting-note">Alerts may be delayed when Android suspends Faff.</p><div class="settings-actions">${row(ui.protected ? 'device storage protected' : 'protect local saves', 'protect', ui.protected)}${row('download backup', 'export')}${row('restore backup', 'import')}</div><p class="setting-note">Saved on this device. No account or sync.</p></div>`;
+}
+
+function sounds(state, ui) {
+  const settings = state.settings;
+  const choices = (key, label, options) => `<label class="sound-choice" for="${key}"><span>${label}</span><select id="${key}" data-setting="${key}">${Object.entries(options).map(([value, name]) => `<option value="${value}" ${settings[key] === value ? 'selected' : ''}>${name}</option>`).join('')}</select></label>`;
+  const volume = (key, label) => `<div class="sound-volume"><label for="${key}">${label}<output for="${key}">${settings[key]}%</output></label><input id="${key}" data-setting="${key}" type="range" min="0" max="100" step="5" value="${settings[key]}" aria-valuetext="${settings[key]} percent"></div>`;
+  return `<div class="sound-controls"><div class="sound-section"><button class="setting-switch" data-setting="sound" role="switch" aria-checked="${settings.sound}"><span class="setting-label">session sound<small>When your 30 minutes are up.</small></span><span class="switch-box" aria-hidden="true">${icon('check')}</span></button>${choices('chime', 'finish with', CHIMES)}${volume('soundVolume', 'chime volume')}<button class="sound-preview" data-action="preview-chime" ${!settings.sound || !settings.soundVolume ? 'disabled' : ''}>${icon('play')}preview chime</button></div><div class="sound-section">${choices('ambience', 'background', AMBIENCES)}${volume('ambienceVolume', 'background volume')}<button class="sound-preview" data-action="preview-ambience" aria-pressed="${ui.previewing}" ${settings.ambience === 'off' || !settings.ambienceVolume ? 'disabled' : ''}>${icon(ui.previewing ? 'pause' : 'play')}${ui.previewing ? 'stop preview' : 'preview · 5 seconds'}</button><p class="setting-note">Plays during a session. Pauses with the timer.</p></div><p class="setting-note">Sounds work offline. Your browser may stop audio when the app is closed or your phone is locked.</p></div>`;
 }
 
 function sheet(state, ui, currentStreak) {
@@ -90,7 +101,7 @@ function sheet(state, ui, currentStreak) {
   let title = '', content = '';
   if (type === 'options') {
     title = date === dateKey() ? 'today' : labelDate(date);
-    content = `<div class="locked-heading">${icon('check')}<span>${day.committedAt ? 'committed' : 'draft'} · ${hours(day.focus + day.faff)}</span></div><div class="locked-row"><span>focus</span><strong>${day.focus} × 30m</strong></div><div class="locked-row"><span>faff</span><strong>${day.faff} × 30m</strong></div><div class="sheet-links">${day.committedAt && !day.off ? row('edit sessions', 'targets') : ''}${row('sessions', 'history')}${row('end day', 'end', !day.committedAt || !!day.endedAt || state.active?.phase === 'running' || state.active?.phase === 'review')}${!ui.standalone ? row('install faff', 'install') : ''}${row('settings', 'settings')}${ui.updateReady ? row('update available', 'update') : ''}</div>`;
+    content = `<div class="locked-heading">${icon('check')}<span>${day.committedAt ? 'committed' : 'draft'} · ${hours(day.focus + day.faff)}</span></div><div class="locked-row"><span>focus</span><strong>${day.focus} × 30m</strong></div><div class="locked-row"><span>faff</span><strong>${day.faff} × 30m</strong></div><div class="sheet-links">${day.committedAt && !day.off ? row('edit sessions', 'targets') : ''}${row('sessions', 'history')}${row('end day', 'end', !day.committedAt || !!day.endedAt || state.active?.phase === 'running' || state.active?.phase === 'review')}${row('sounds', 'sounds')}${!ui.standalone ? row('install faff', 'install') : ''}${row('settings', 'settings')}${ui.updateReady ? row('update available', 'update') : ''}</div>`;
   }
   if (type === 'targets') {
     title = 'today’s plan';
@@ -111,6 +122,7 @@ function sheet(state, ui, currentStreak) {
     content = `<p class="sheet-note">${labelDate(date)}${day.endedAt ? ' · updates the streak' : ''}</p>${gradeButtons(`data-correction="${escape(ui.sheet.id)}" data-date="${date}"`)}`;
   }
   if (type === 'settings') { title = 'settings'; content = settings(state, ui); }
+  if (type === 'sounds') { title = 'sounds'; content = sounds(state, ui); }
   if (type === 'install') {
     title = 'install faff';
     content = `<p class="sheet-note">${ui.installReady ? 'Add Faff to your home screen.' : 'Open your browser menu and choose “Add to Home screen” or “Install app”.'}</p>${ui.installReady ? primary('install', 'install-now') : ''}`;

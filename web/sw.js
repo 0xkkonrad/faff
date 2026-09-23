@@ -1,7 +1,8 @@
-const CACHE = 'faff-shell-v4';
+const CACHE = 'faff-shell-v5';
 const SCOPE = new URL(self.registration.scope);
 const SHELL = [
   './', './index.html', './app.js', './model.js', './storage.js', './migration.js', './view.js', './icons.js',
+  './sounds.js', './sound-settings.js',
   './fonts.css', './app.css', './calendar.css', './responsive.css', './logo.svg', './icon.svg',
   './manifest.webmanifest', './fonts/plex-0.woff2', './fonts/plex-1.woff2',
   './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png', './icons/apple-touch-icon.png',

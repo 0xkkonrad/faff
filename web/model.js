@@ -1,3 +1,5 @@
+import { SOUND_DEFAULTS, validSoundSetting } from './sound-settings.js';
+
 export const SESSION_MS = 30 * 60 * 1000;
 export const MAX_SESSIONS = 24;
 
@@ -24,7 +26,7 @@ export function newDay(date, defaults) {
 
 export function createState(now = Date.now()) {
   const defaults = { focus: 8, faff: 4 };
-  return { schemaVersion: 2, revision: 0, defaults, settings: { sound: true, keepAwake: false, alerts: false }, days: { [dateKey(now)]: newDay(dateKey(now), defaults) }, active: null };
+  return { schemaVersion: 2, revision: 0, defaults, settings: { sound: true, keepAwake: false, alerts: false, ...SOUND_DEFAULTS }, days: { [dateKey(now)]: newDay(dateKey(now), defaults) }, active: null };
 }
 
 export function totals(day) {
@@ -74,6 +76,9 @@ export function validateState(state) {
   assert(Number.isSafeInteger(state.revision) && state.revision >= 0, 'Invalid saved revision.');
   assert(validTargets(state.defaults?.focus, state.defaults?.faff), 'Invalid saved plan.');
   assert(state.settings && ['sound', 'keepAwake', 'alerts'].every(key => typeof state.settings[key] === 'boolean'), 'Invalid saved settings.');
+  for (const key of Object.keys(SOUND_DEFAULTS)) {
+    assert(state.settings[key] === undefined || validSoundSetting(key, state.settings[key]), 'Invalid saved sound settings.');
+  }
   assert(state.days && typeof state.days === 'object' && !Array.isArray(state.days) && Object.keys(state.days).length <= 50000, 'Invalid saved days.');
   const ids = new Set();
   const timestamp = value => Number.isFinite(value) && value > 0;
@@ -128,7 +133,7 @@ function reconcile(state, now, events, editDay) {
 export function updateState(previous, action = { type: 'SYNC' }, now = Date.now()) {
   // Historical days stay shared; only the days touched by this action are copied.
   const state = {
-    ...previous, defaults: { ...previous.defaults }, settings: { ...previous.settings },
+    ...previous, defaults: { ...previous.defaults }, settings: { ...SOUND_DEFAULTS, ...previous.settings },
     days: { ...previous.days }, active: previous.active ? { ...previous.active } : null,
   }, events = [];
   function editDay(date) {
@@ -139,6 +144,7 @@ export function updateState(previous, action = { type: 'SYNC' }, now = Date.now(
     return state.days[date];
   }
   let changed = reconcile(state, now, events, editDay), undo = null;
+  if (Object.keys(SOUND_DEFAULTS).some(key => previous.settings[key] === undefined)) changed = true;
   const today = dateKey(now), date = action.date || today, day = action.type === 'SYNC' ? state.days[date] : editDay(date);
   const editable = date === today || state.active?.date === date;
   const active = state.active;
@@ -221,7 +227,7 @@ export function updateState(previous, action = { type: 'SYNC' }, now = Date.now(
       }
       day.endedAt = now; changed = true; break;
     case 'SETTING':
-      assert(['sound', 'keepAwake', 'alerts'].includes(action.key) && typeof action.value === 'boolean', 'Unknown setting.');
+      assert((['sound', 'keepAwake', 'alerts'].includes(action.key) && typeof action.value === 'boolean') || validSoundSetting(action.key, action.value), 'Unknown setting.');
       state.settings[action.key] = action.value; changed = true; break;
     default: throw new Error('Unknown action.');
   }

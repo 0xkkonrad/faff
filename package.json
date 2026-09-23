@@ -8,6 +8,7 @@
     "dev": "python3 -m http.server 8777 --directory web",
     "test": "node --test tests/*.test.mjs",
     "test:browser": "node tests/browser.cjs && node tests/browser-regressions.cjs",
+    "test:sounds": "node tests/sounds.cjs",
     "test:pwa": "node tests/pwa-update.cjs",
     "test:rebrand": "node tests/rebrand.cjs",
     "build:brand": "node scripts/build-brand.mjs"
